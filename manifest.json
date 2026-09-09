@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "X Article → PDF",
+  "version": "1.0.0",
+  "description": "把 X (Twitter) 的 Article 长文或推文串导出为保留排版、图片内联的可打印 HTML / PDF。",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["https://pbs.twimg.com/*", "https://*.x.com/*", "https://*.twitter.com/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "导出这篇 X 长文为 PDF" }
+}
