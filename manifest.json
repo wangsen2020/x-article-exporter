@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "X Article → PDF",
-  "version": "2.2.2",
+  "version": "2.3.2",
   "description": "把 X (Twitter) 的 Article 长文或推文串导出为 PDF / Markdown / 自包含 HTML，并在本地留一份快照存档——原帖被删也还看得到。",
   "permissions": [
     "debugger",
@@ -64,7 +64,9 @@
         "https://twitter.com/*"
       ],
       "js": [
-        "extract.js"
+        "md2html.js",
+        "extract.js",
+        "compose.js"
       ],
       "run_at": "document_idle",
       "world": "MAIN"
