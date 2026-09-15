@@ -23,7 +23,9 @@ window.addEventListener('message', (e) => {
 
   if (!alive()) {
     // 桥接层已失效：不发 alive，直接回失败，让页面侧退回本地下载。
-    reply({ ok: false, error: 'extension reloaded — refresh the page', format });
+    // 这条提示会原样显示给用户，所以必须说清楚「怎么办」——它最常见的触发场景
+    // 是开发/更新扩展后没刷新旧标签页，表现正是「PDF 导不出来，只掉一个 HTML」。
+    reply({ ok: false, error: '扩展已更新，请刷新本页后重试 (extension reloaded — refresh this tab)', format });
     return;
   }
 

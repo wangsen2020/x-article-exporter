@@ -660,7 +660,10 @@
       onTick && onTick(limit ? Math.min(99, Math.round((y / limit) * 100)) : 0, imgCount());
     }
 
-    await Promise.all([...root().querySelectorAll('img')].map((i) => (i.decode ? i.decode().catch(() => {}) : null)));
+    // img.decode() 对不参与渲染的图（X 把视频缩略图包在 visibility:hidden 里）
+    // 可以永远不落定，.catch() 挡不住「不回话」。已经加载好的直接跳过，剩下的限时。
+    const pend = [...root().querySelectorAll('img')].filter((i) => i.decode && !(i.complete && i.naturalWidth));
+    if (pend.length) await Promise.race([Promise.all(pend.map((i) => i.decode().catch(() => {}))), sleep(6000)]);
     window.scrollTo(0, 0);
     await sleep(300);
   }

@@ -667,13 +667,33 @@
     return (root.innerText || '').length > before;
   }
 
+  // 等图片解码完，但**必须有上限**。
+  //
+  // img.decode() 有两个坑，都是真实卡死教出来的：
+  //  1. 对已经加载好（complete && naturalWidth）的图，它没有任何意义；
+  //  2. 对不参与渲染的图（X 把视频缩略图包在 visibility:hidden 里），Chrome 的
+  //     decode() promise 可以**永远不落定**——图其实早解码完了，promise 就是不回话。
+  //     .catch() 挡的是失败，挡不住「不回话」。
+  // 于是 loadArticle 会永远停在这一行，导出消息根本发不出去，连退回本地下载的
+  // 兜底计时器都还没启动，表现就是提示条冻在某个百分比上一动不动。
+  // （实测：pbs.twimg.com/amplify_video_thumb 的 4 张图 complete=true、
+  //   naturalWidth=1200，decode() 全部挂死。）
+  async function decodeAll(imgs, ms) {
+    const pending = imgs.filter((i) => i.decode && !(i.complete && i.naturalWidth));
+    if (!pending.length) return;
+    await Promise.race([
+      Promise.all(pending.map((i) => i.decode().catch(() => {}))),
+      sleep(ms || 4000),
+    ]);
+  }
+
   // 把这一条滚进视口并等它的图片解码完——X 的配图是懒加载的，
   // 不在视口里根本不会发请求，抽出来就是一堆空 figure。
   async function loadTweetImages(root) {
     try { root.scrollIntoView({ block: 'center' }); } catch (e) {}
     await sleep(400);
     const imgs = [...root.querySelectorAll('[data-testid="tweetPhoto"] img, img[src*="/media/"]')];
-    await Promise.all(imgs.map((i) => (i.decode ? i.decode().catch(() => {}) : null)));
+    await decodeAll(imgs, 4000);
     await sleep(200);
     return imgs.length;
   }
@@ -708,7 +728,7 @@
       onTick && onTick(limit ? Math.min(99, Math.round((y / limit) * 100)) : 0, imgCount());
     }
 
-    await Promise.all([...root().querySelectorAll('img')].map((i) => (i.decode ? i.decode().catch(() => {}) : null)));
+    await decodeAll([...root().querySelectorAll('img')], 6000);
     window.scrollTo(0, 0);
     await sleep(300);
   }
