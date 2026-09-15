@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>存档快照</title>
+<style>
+  :root{ --bar:#0f1419; --fg:#e7e9ea; --acc:#1d9bf0; }
+  html,body{margin:0;height:100%;background:#fff}
+  .bar{position:fixed;inset:0 0 auto 0;height:44px;background:var(--bar);color:var(--fg);
+       display:flex;align-items:center;gap:10px;padding:0 14px;z-index:2;
+       font:13px/1.4 -apple-system,"Segoe UI","PingFang SC",system-ui,sans-serif}
+  .bar .t{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.92}
+  .bar button{font:inherit;padding:5px 12px;border-radius:999px;border:0;
+              background:#2f3b45;color:#fff;cursor:pointer}
+  .bar button.primary{background:var(--acc)}
+  .bar button:hover{filter:brightness(1.12)}
+  iframe{position:absolute;inset:44px 0 0 0;width:100%;height:calc(100% - 44px);border:0;background:#fff}
+  .msg{position:absolute;inset:44px 0 0 0;display:flex;align-items:center;justify-content:center;
+       color:#536471;font:15px system-ui,sans-serif}
+</style>
+</head>
+<body>
+  <div class="bar">
+    <span class="t" id="title">正在载入存档…</span>
+    <button class="primary" id="print">打印 / 存为 PDF</button>
+    <button id="save">下载 HTML</button>
+  </div>
+  <div class="msg" id="msg">正在载入存档…</div>
+<script src="archive.js"></script>
+<script src="snapshot.js"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>存档库 — X Article → PDF</title>
+<style>
+  :root{
+    --bg:#f7f9fa; --card:#fff; --fg:#0f1419; --mut:#536471; --line:#e1e8ed;
+    --acc:#1d9bf0; --danger:#f4212e; --chip:#eff3f4;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#15202b; --card:#1e2732; --fg:#e7e9ea; --mut:#8b98a5; --line:#38444d;
+           --chip:#273340; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:15px/1.6 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
+
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:1.5em;margin:0;letter-spacing:-.01em}
+  .sub{color:var(--mut);font-size:.9em;margin:0 0 20px}
+
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
+  input[type=search],input[type=number]{
+    font:inherit;padding:8px 12px;border-radius:999px;border:1px solid var(--line);
+    background:var(--card);color:var(--fg);outline:none}
+  input[type=search]{flex:1;min-width:200px}
+  input[type=number]{width:90px;border-radius:8px}
+  input:focus{border-color:var(--acc)}
+  button{font:inherit;padding:8px 14px;border-radius:999px;border:1px solid var(--line);
+         background:var(--card);color:var(--fg);cursor:pointer}
+  button:hover{background:var(--chip)}
+  button.primary{background:var(--acc);color:#fff;border-color:transparent}
+  button.primary:hover{filter:brightness(1.08)}
+  button.danger{color:var(--danger)}
+  .usage{color:var(--mut);font-size:.88em;margin-left:auto;white-space:nowrap}
+
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+        display:flex;flex-direction:column}
+  .thumb{aspect-ratio:16/9;background:var(--chip);display:block;width:100%;object-fit:cover}
+  .thumb.none{display:flex;align-items:center;justify-content:center;padding:14px;
+              color:var(--mut);font-size:.82em;line-height:1.5;overflow:hidden;text-align:left}
+  .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .title{font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;
+         -webkit-box-orient:vertical;overflow:hidden}
+  .who{color:var(--mut);font-size:.85em}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}
+  .chip{background:var(--chip);color:var(--mut);border-radius:6px;padding:2px 7px;font-size:.74em}
+  .acts{display:flex;gap:6px;flex-wrap:wrap;padding-top:4px}
+  .acts button{padding:5px 10px;font-size:.82em;border-radius:8px}
+  .path{color:var(--mut);font-size:.74em;word-break:break-all;
+        border-top:1px dashed var(--line);padding-top:7px}
+  .path b{font-weight:600;color:var(--fg)}
+
+  .empty{text-align:center;color:var(--mut);padding:70px 20px;line-height:1.8}
+  .empty strong{display:block;color:var(--fg);font-size:1.05em;margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><h1>存档库</h1></header>
+  <p class="sub">每次导出都会在本地留一份自包含快照（图片已内联）。原帖被作者删除后，这里仍然打得开。</p>
+
+  <div class="bar">
+    <input type="search" id="q" placeholder="搜索标题、作者、正文…">
+    <label style="color:var(--mut);font-size:.88em">最多保留
+      <input type="number" id="cap" min="0" step="10" title="0 表示不限">
+      篇</label>
+    <button id="save">保存并清理</button>
+    <span class="usage" id="usage"></span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>
+    <strong>还没有存档</strong>
+    在 X 的帖子上用扩展导出一次（PDF / Markdown / HTML），快照就会出现在这里。
+  </div>
+</div>
+<script src="archive.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

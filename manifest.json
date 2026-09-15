@@ -1,10 +1,83 @@
 {
   "manifest_version": 3,
   "name": "X Article → PDF",
-  "version": "1.0.0",
-  "description": "把 X (Twitter) 的 Article 长文或推文串导出为保留排版、图片内联的可打印 HTML / PDF。",
-  "permissions": ["activeTab", "scripting"],
-  "host_permissions": ["https://pbs.twimg.com/*", "https://*.x.com/*", "https://*.twitter.com/*"],
-  "background": { "service_worker": "background.js" },
-  "action": { "default_title": "导出这篇 X 长文为 PDF" }
+  "version": "2.2.2",
+  "description": "把 X (Twitter) 的 Article 长文或推文串导出为 PDF / Markdown / 自包含 HTML，并在本地留一份快照存档——原帖被删也还看得到。",
+  "permissions": [
+    "debugger",
+    "downloads",
+    "storage",
+    "unlimitedStorage"
+  ],
+  "host_permissions": [
+    "https://x.com/*",
+    "https://twitter.com/*",
+    "https://pbs.twimg.com/*"
+  ],
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "X Article → PDF",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "viewer.html",
+        "viewer.js"
+      ],
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "net-hook.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "extract.js"
+      ],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "bridge.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
 }

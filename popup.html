@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<style>
+  :root{
+    --bg:#fff; --fg:#0f1419; --mut:#536471; --line:#e1e8ed;
+    --acc:#1d9bf0; --hover:#eff3f4;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#1e2732; --fg:#e7e9ea; --mut:#8b98a5; --line:#38444d; --hover:#273340; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;width:272px;background:var(--bg);color:var(--fg);
+       font:14px/1.5 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+
+  .head{padding:12px 14px 10px}
+  .head h1{font-size:14px;margin:0;font-weight:600}
+  .state{color:var(--mut);font-size:12px;margin-top:3px}
+  .state.ok{color:var(--acc)}
+
+  hr{border:0;border-top:1px solid var(--line);margin:0}
+
+  .rows{padding:6px}
+  .row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+       padding:9px 10px;border:0;border-radius:8px;background:none;color:inherit;
+       font:inherit;cursor:pointer}
+  .row:hover:not(:disabled){background:var(--hover)}
+  .row:disabled{opacity:.4;cursor:default}
+  .row svg{width:17px;height:17px;flex:none;fill:currentColor}
+  .row .lbl{flex:1}
+  .row .badge{color:var(--mut);font-size:12px}
+  .row .chev{color:var(--mut);font-size:12px}
+
+  .foot{padding:8px 14px 11px;color:var(--mut);font-size:11.5px}
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>X Article → PDF</h1>
+    <div class="state" id="state">正在检查当前页面…</div>
+  </div>
+  <hr>
+  <div class="rows">
+    <button class="row" id="pdf" disabled>
+      <svg viewBox="0 0 24 24"><path fill-rule="evenodd" d="M6 2h8.4L20 7.6V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Zm0 1.75a.25.25 0 0 0-.25.25v16c0 .14.11.25.25.25h12a.25.25 0 0 0 .25-.25V9h-4.5a1.5 1.5 0 0 1-1.5-1.5V3.75H6Zm8 .81v2.94c0 .14.11.25.25.25h2.94L14 4.56Z"/><path d="M11.25 10.5h1.5v4.44l1.22-1.22 1.06 1.06-2.5 2.5a.75.75 0 0 1-1.06 0l-2.5-2.5 1.06-1.06 1.22 1.22V10.5Z"/></svg>
+      <span class="lbl">导出为 PDF</span>
+    </button>
+    <button class="row" id="md" disabled>
+      <svg viewBox="0 0 24 24"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm.75 1.75v10.5h16.5V6.75H3.75Z"/><path d="M5.5 15.5v-7h1.8l1.7 2.6 1.7-2.6h1.8v7h-1.8v-4.2l-1.7 2.5-1.7-2.5v4.2H5.5Zm11.3 0-2.4-3h1.5v-4h1.8v4h1.5l-2.4 3Z"/></svg>
+      <span class="lbl">导出为 Markdown</span>
+    </button>
+    <button class="row" id="html" disabled>
+      <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 9h-3.2a15.7 15.7 0 0 0-1-5.1A8.3 8.3 0 0 1 18.9 11ZM12 3.9c.7 1 1.6 3.2 1.8 7.1h-3.6c.2-3.9 1.1-6.1 1.8-7.1ZM5.1 11a8.3 8.3 0 0 1 4.2-5.1 15.7 15.7 0 0 0-1 5.1H5.1Zm0 2h3.2c.1 2 .5 3.8 1 5.1A8.3 8.3 0 0 1 5.1 13Zm5.1 0h3.6c-.2 3.9-1.1 6.1-1.8 7.1-.7-1-1.6-3.2-1.8-7.1Zm4.5 5.1c.5-1.3.9-3.1 1-5.1h3.2a8.3 8.3 0 0 1-4.2 5.1Z"/></svg>
+      <span class="lbl">导出为 HTML（自包含）</span>
+    </button>
+  </div>
+  <hr>
+  <div class="rows">
+    <button class="row" id="history">
+      <svg viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4.2l1.6 2H19a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6Zm2-.25a.25.25 0 0 0-.25.25v12c0 .14.11.25.25.25h14a.25.25 0 0 0 .25-.25V8a.25.25 0 0 0-.25-.25h-9.1L8.3 5.75H5Z"/></svg>
+      <span class="lbl">导出历史</span>
+      <span class="badge" id="count"></span>
+      <span class="chev">›</span>
+    </button>
+  </div>
+  <div class="foot" id="foot"></div>
+<script src="archive.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>
