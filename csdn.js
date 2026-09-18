@@ -13,21 +13,18 @@
  * 往编辑器合成派发 ClipboardEvent('paste')，clipboardData.files 里带一个图片 File，
  * CSDN 就会走它自己的上传流水线，传到 i-blog.csdnimg.cn 并在光标处写下
  * `![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/<hash>.png)`。
- * 实测 2.1MB 的 PNG 约 1.9s 传完，而且**没有中间占位态**——文本要么没变，
- * 要么一步到位就是最终直链。（成功好认，难认的是失败，见 upload()。）
+ * 实测 2.1MB 的 PNG 约 1.9s 传完。
  *
- * 顺序为什么是「清空 → 一张张传 → 最后整篇写一次」，而不是像知乎那样边走边贴：
+ * 但**别去正文里认上传结果**——CSDN 那个回填是坏的，在非空文档里连传会互相覆盖，
+ * 4 张传完正文里一个链接都不剩。上传本身没问题（两个 POST 全是 200），
+ * 而且 OBS 的响应里直接就带最终直链。所以结果从网络层拿，完整的来龙去脉见 HOOK 那段。
+ *
+ * 于是顺序是「一张张传（只为拿 URL）→ 最后整篇写一次」，而不是像知乎那样边走边贴：
  *  - 上传把链接写在光标处，alt 恒定是 CSDN 自己那句「在这里插入图片描述」，
  *    顺着贴就没法保留原文的 alt；先拿到链接再回填就能保留。
  *  - 源码编辑器里一次性写入的结果和原文逐字一致，不用担心分段拼接处多/少空行。
- *  - 最要命的一条：**在非空文档里连着传，第二张开始会互相覆盖**。
- *    实测第二张传完，第一张那行 `![…](url)` 会被削成光秃秃的 `在这里插入图片描述`，
- *    成功/失败严格交替。原因是 CSDN 先插一个占位、上传完再按记下来的偏移替换回去，
- *    而合成 paste 没有走它自己的选区更新（用 DOM Range 挪光标它根本不认，
- *    等一拍让 selectionchange 跑到也没用），偏移就是旧的，替换自然落到上一张身上。
- *    改成**每张都在空文档里传**之后，5/5 全中、每张稳定 1 秒——这才是这个顺序的真正理由。
- *  代价是上传期间编辑器是空的：用户原有的正文在第一步就记下来了，
- *  最后连同新正文一起写回去；中途抛错也会在 finally 里放回去（见 run）。
+ *  上传期间 CSDN 会把编辑器插得乱七八糟，但用户原有的正文在第一步就记下来了，
+ *  最后连同新正文一起写回去；中途抛错也会在 catch 里放回去（见 run）。
  *
  * 那 CSDN 自己不是会「外链图片转存」吗，为什么还要我们传？
  * 会，而且是**服务端**去抓：粘一个 https 图片链接进来，它会显示「外链图片转存中…」，
@@ -170,45 +167,84 @@
     }
   }
 
-  const CDN = /https?:\/\/[\w.-]*csdnimg\.cn\/[^\s)]+/g;
-  const cdnUrls = (t) => t.match(CDN) || [];
-
-  // 传一张，返回 CSDN 直链；没传上返回 null。
+  // ---------- 上传结果从网络层拿，不从正文里认 ----------
   //
-  // **在空文档里传**，别在正文里传——理由见文件头那条「互相覆盖」。
+  // 这是整个文件最关键的一个决定，值得说清楚。
   //
-  // 空文档让成功的信号变得很干净：冒出一个 csdnimg 链接就是成了。
-  // 难的是失败怎么认——失败时 CSDN 只留一行光秃秃的 alt（「在这里插入图片描述」），
-  // **永远不会**有链接。所以：
-  //   盯着链接死等 → 失败的那张白等满 90 秒，几张连起来直接把整轮拖死；
-  //   「正文一变就判」→ 变的第一拍往往是那行 alt，慢图会被误判成失败。
-  // 取两者之间：正文**变过之后又稳住 2 秒**还没有链接，才算这张没了。
-  // 快图 1 秒出结果，失败 2 秒结案，慢图爱传多久传多久（上限 90 秒）。
-  async function upload(ed, file) {
-    await clear(ed);
-    firePaste(ed, (dt) => dt.items.add(file));
+  // CSDN 传完图会把 ![](url) 写回编辑器，但**这一步是坏的**：在非空文档里连着传，
+  // 第二张的回填会按旧偏移落到第一张身上，把 ![…](url) 啃成光秃秃的
+  // 「在这里插入图片描述」。实测 4 张连传，最后正文里一个链接都不剩。
+  // （换成往 CSDN 自己的 input[type=file] 里塞 files 再派发 change 也一样烂——
+  //   坏的是回填，不是触发方式。这条我试过，别再试第二遍。）
+  //
+  // 但上传本身**从来没失败过**：signature 和华为云 OBS 两个 POST 全是 200，
+  // 而且 OBS 那个响应里直接就带最终直链：
+  //   {"code":200,"data":{"imageUrl":"https://i-blog.csdnimg.cn/direct/<hash>.png", ...}}
+  // 所以别再跟那个坏掉的回填较劲了——**直接问上传要结果**。
+  //
+  // 这样换来三件事：
+  //  - 不用为了躲开覆盖而在每张图之前清空编辑器，用户正在写的东西全程原样待着；
+  //  - 判定是精确的：有 imageUrl 就是成了，OBS 回了却没有 imageUrl 就是没成。
+  //    不再需要「变过又稳住 2 秒」那种靠猜的启发式，也不需要重试兜底；
+  //  - 快：实测每张稳定 1 秒。
+  //
+  // 编辑器那边照样会被 CSDN 自己插得乱七八糟，无所谓——最后一步整篇覆盖时一并抹掉。
+  const HOOK = { urls: [], fails: 0, on: false };
 
-    const t0 = Date.now();
-    let seen = ed.textContent;
-    let changedAt = 0;
-    while (Date.now() - t0 < 90000) {
-      const u = cdnUrls(ed.textContent).pop();
-      if (u) return u;
-      const now = ed.textContent;
-      if (now !== seen) { seen = now; changedAt = Date.now(); }
-      else if (changedAt && Date.now() - changedAt > 2000) return null;
-      await sleep(200);
-    }
-    return null;
+  function note(url, text) {
+    const u = String(url || '');
+    if (!/myhuaweicloud|obs\.|csdn/i.test(u)) return;
+    let j = null;
+    try { j = JSON.parse(text); } catch (e) { return; }
+    if (!j || !j.data) return;
+    if (j.data.imageUrl) HOOK.urls.push(String(j.data.imageUrl));
+    // OBS 回了却没给 imageUrl —— 这张是真没传上，不用干等超时
+    else if (/myhuaweicloud|obs\./i.test(u)) HOOK.fails++;
   }
 
-  // 失败是秒级返回的（不是干等），所以重试一次很便宜，
-  // 别为了省这一次让整篇缺图。
-  async function uploadTwice(ed, file) {
-    const a = await upload(ed, file);
-    if (a) return a;
-    await sleep(800);
-    return await upload(ed, file);
+  // 只读不改：一律先把原实现跑完、结果原样返回，note 出任何岔子都吞掉，
+  // 绝不能因为我们挂了钩子就把人家页面搞坏。
+  function installHook() {
+    if (HOOK.on) return;
+    HOOK.on = true;
+    try {
+      const of = window.fetch;
+      window.fetch = function (...a) {
+        const p = of.apply(this, a);
+        try {
+          const u = (a[0] && a[0].url) || a[0];
+          p.then((r) => { try { r.clone().text().then((t) => note(u, t), () => {}); } catch (e) {} }, () => {});
+        } catch (e) {}
+        return p;
+      };
+      const oo = XMLHttpRequest.prototype.open;
+      const os = XMLHttpRequest.prototype.send;
+      XMLHttpRequest.prototype.open = function (m, u) {
+        this.__xaeUrl = u;
+        return oo.apply(this, arguments);
+      };
+      XMLHttpRequest.prototype.send = function () {
+        try {
+          this.addEventListener('load', () => { try { note(this.__xaeUrl, this.responseText); } catch (e) {} });
+        } catch (e) {}
+        return os.apply(this, arguments);
+      };
+    } catch (e) {}
+  }
+
+  // 传一张，返回 CSDN 直链；没传上返回 null。
+  // 90 秒是给大图留的余量，正常一秒就回来了——失败也不会等到超时，见上面的 fails。
+  async function upload(ed, file) {
+    const n = HOOK.urls.length;
+    const f = HOOK.fails;
+    firePaste(ed, (dt) => dt.items.add(file));
+    const t0 = Date.now();
+    while (Date.now() - t0 < 90000) {
+      if (HOOK.urls.length > n) return HOOK.urls[HOOK.urls.length - 1];
+      if (HOOK.fails > f) return null;
+      await sleep(150);
+    }
+    return null;
   }
 
   // ---------- 主流程 ----------
@@ -217,7 +253,9 @@
     if (!ed) return T.noEditor;
     if (!md.trim()) return T.empty;
 
-    // 上传期间编辑器会被清空（见 upload），所以原文必须先记下来，
+    installHook();
+
+    // CSDN 自己会往编辑器里插图（插得还是坏的，见上面 HOOK 那段），所以原文先记下来，
     // 最后连同新正文一起写回去。中途抛错也要放回去——见下面的 catch。
     const orig = ed.textContent.replace(/\s+$/, '');
 
@@ -234,7 +272,7 @@
       for (let i = 0; i < urls.length; i++) {
         onStep(T.img(i + 1, urls.length));
         const file = await grab(urls[i]);
-        const up = file ? await uploadTwice(ed, file) : null;
+        const up = file ? await upload(ed, file) : null;
         if (up) map.set(urls[i], up);
         if (up) done++;
         else if (/^https?:/i.test(urls[i])) handed++;
