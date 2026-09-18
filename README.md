@@ -1,9 +1,21 @@
+![X Article → PDF](docs/hero.svg)
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Manifest-V3-38bdf8?style=flat-square&amp;logo=googlechrome&amp;logoColor=white" alt="Manifest V3">
+  <img src="https://img.shields.io/badge/Browser-Chrome%20%26%20Edge-60a5fa?style=flat-square&amp;logo=googlechrome&amp;logoColor=white" alt="Chrome and Edge">
+  <img src="https://img.shields.io/badge/License-MIT-94a3b8?style=flat-square" alt="MIT License">
+</p>
+
 # X Article → PDF
 
 把 X (Twitter) 的 **Article 长文**或**推文串**导出为保留排版的 PDF——
 文字可选中可搜索、图片原图分辨率、直接进浏览器下载列表，不弹打印对话框、不开新标签页。
 
 也可以导出为图片全部内联的自包含 HTML，用于离线归档。
+
+## 功能 / Features
+
+![X Article → PDF 核心能力概览](docs/features.svg)
 
 ## 用法
 

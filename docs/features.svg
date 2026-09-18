@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 610" role="img" aria-labelledby="title desc">
+  <title id="title">X Article to PDF 核心能力概览</title>
+  <desc id="desc">从 X 内容捕获、导出归档到 Markdown 发布工作流的四个能力卡片</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b1116"/><stop offset="1" stop-color="#15202b"/></linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#60a5fa"/></linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#000" flood-opacity=".28"/></filter>
+  </defs>
+  <rect width="1280" height="610" fill="url(#bg)"/>
+  <path d="M66 115h1148" stroke="#28485c" stroke-width="2"/>
+  <g font-family="system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <text x="66" y="70" fill="#f8fafc" font-size="34" font-weight="750">从 X 内容到可复用的内容资产</text>
+    <text x="66" y="101" fill="#9db2c2" font-size="17">一条明确的工作流：捕获、导出、归档、再发布。</text>
+    <path d="M273 332h51m244 0h51m244 0h51" stroke="url(#line)" stroke-width="3" stroke-linecap="round"/>
+    <path d="m317 324 10 8-10 8m295-16 10 8-10 8m295-16 10 8-10 8" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(66 170)" filter="url(#shadow)">
+      <rect width="250" height="306" rx="18" fill="#101c25" stroke="#2c5269" stroke-width="2"/>
+      <circle cx="42" cy="45" r="23" fill="#173a50"/><path d="M31 39h22M31 47h15m-15 8h22" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round"/>
+      <text x="28" y="104" fill="#f8fafc" font-size="23" font-weight="700">捕获内容</text>
+      <text x="28" y="136" fill="#b7c6d3" font-size="16">面向 X Article 与推文串</text>
+      <rect x="28" y="166" width="194" height="84" rx="10" fill="#152b3a"/>
+      <path d="M48 187h90m-90 18h146m-146 18h119" stroke="#7090a5" stroke-width="7" stroke-linecap="round"/>
+      <text x="28" y="279" fill="#7dd3fc" font-size="15" font-weight="650">DOM / GraphQL 路径</text>
+    </g>
+    <g transform="translate(361 170)" filter="url(#shadow)">
+      <rect width="250" height="306" rx="18" fill="#101c25" stroke="#2c5269" stroke-width="2"/>
+      <circle cx="42" cy="45" r="23" fill="#173a50"/><path d="M32 36h17l9 9v18H32Z" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linejoin="round"/><path d="M49 36v10h9M37 54h16" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round"/>
+      <text x="28" y="104" fill="#f8fafc" font-size="23" font-weight="700">导出格式</text>
+      <text x="28" y="136" fill="#b7c6d3" font-size="16">保留排版，文字可搜索</text>
+      <g font-size="16" font-weight="700"><rect x="28" y="166" width="61" height="36" rx="8" fill="#1b4963"/><text x="42" y="190" fill="#e0f2fe">PDF</text><rect x="98" y="166" width="105" height="36" rx="8" fill="#1b4963"/><text x="111" y="190" fill="#e0f2fe">Markdown</text><rect x="28" y="213" width="104" height="36" rx="8" fill="#1b4963"/><text x="43" y="237" fill="#e0f2fe">HTML</text></g>
+      <text x="28" y="279" fill="#7dd3fc" font-size="15" font-weight="650">直接进入下载列表</text>
+    </g>
+    <g transform="translate(656 170)" filter="url(#shadow)">
+      <rect width="250" height="306" rx="18" fill="#101c25" stroke="#2c5269" stroke-width="2"/>
+      <circle cx="42" cy="45" r="23" fill="#173a50"/><path d="M31 48c0-8 5-13 11-13s11 5 11 13v12H31Z" fill="none" stroke="#7dd3fc" stroke-width="3"/><path d="M36 35v-5m12 5v-5M36 60h12" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round"/>
+      <text x="28" y="104" fill="#f8fafc" font-size="23" font-weight="700">离线归档</text>
+      <text x="28" y="136" fill="#b7c6d3" font-size="16">把图片内联进自包含 HTML</text>
+      <rect x="28" y="166" width="194" height="84" rx="10" fill="#152b3a"/>
+      <path d="M48 187h43l12 12 23-25 26 29h42M48 224h146" fill="none" stroke="#7dd3fc" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="28" y="279" fill="#7dd3fc" font-size="15" font-weight="650">原帖删除后仍可查看</text>
+    </g>
+    <g transform="translate(951 170)" filter="url(#shadow)">
+      <rect width="250" height="306" rx="18" fill="#101c25" stroke="#2c5269" stroke-width="2"/>
+      <circle cx="42" cy="45" r="23" fill="#173a50"/><path d="M31 38h22v18H40l-9 8v-8Z" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linejoin="round"/><path d="M37 45h10m-10 6h7" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round"/>
+      <text x="28" y="104" fill="#f8fafc" font-size="23" font-weight="700">Markdown 工作流</text>
+      <text x="28" y="136" fill="#b7c6d3" font-size="16">从编辑到多平台发布辅助</text>
+      <path d="M37 184h61m-61 22h61m25-11h58" stroke="#7090a5" stroke-width="8" stroke-linecap="round"/>
+      <path d="m105 173 12 11-12 11m-1 0 12 11-12 11" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="28" y="279" fill="#7dd3fc" font-size="15" font-weight="650">X / 知乎 / CSDN</text>
+    </g>
+    <text x="66" y="548" fill="#8fa7b8" font-size="16">所有处理在浏览器工作流中完成；PDF 使用 Chrome DevTools Protocol 生成。</text>
+  </g>
+</svg>
