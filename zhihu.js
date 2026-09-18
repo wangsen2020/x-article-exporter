@@ -14,7 +14,8 @@
  * 图片从哪来：
  *  - http(s) 链接：直接在页面里 fetch。实测 pbs.twimg.com 带 CORS 头，能拿到 blob；
  *    抓不到的（防盗链、墙）不阻塞，跳过并在末尾报数。
- *  - 相对路径：从用户一起选中的文件里按文件名找。
+ *  - 相对路径：从用户一起选中的文件里按文件名找。没一起选中的，读完 md 会点名再要一次
+ *    （见 askFiles —— 不能直接弹第二个文件框，那时候已经没有用户手势了）。
  *
  * 为什么不走知乎自己的「识别 Markdown」和「导入」：
  *  - 提示条那条路（识别到特殊格式 → 确认并解析）实测会把整篇压成一个段落；
@@ -36,6 +37,10 @@
     hint: '选一个 .md 文件，正文和图片一起灌进来（图片自动上传）',
     pick: '选择 .md 文件（可同时选中本地图片）',
     reading: '正在读取…',
+    need: (n, names) =>
+      `正文里有 ${n} 张本地图片还没选中：` + names.slice(0, 3).join('、') + (names.length > 3 ? ' 等' : ''),
+    needBtn: '选择这些图片',
+    needSkip: '跳过（留成文字链接）',
     noEditor: '没找到正文编辑器',
     noState: '接不上编辑器，这次没动正文',
     empty: '这个 .md 是空的',
@@ -119,12 +124,25 @@
   // ---------- 取图 ----------
   const local = new Map(); // 用户一起选中的本地图片，按文件名索引
 
-  async function grab(url) {
-    // 相对路径 / 纯文件名：在一起选中的文件里找
-    if (!/^https?:/i.test(url) && !/^data:/i.test(url)) {
-      const name = decodeURIComponent(url.split(/[?#]/)[0].split('/').pop() || '').toLowerCase();
-      return local.get(name) || null;
+  // 相对路径 / 纯文件名 → 用来在 local 里查的键。非本地链接返回 null。
+  function localKey(url) {
+    if (/^https?:/i.test(url) || /^data:/i.test(url)) return null;
+    return decodeURIComponent(url.split(/[?#]/)[0].split('/').pop() || '').toLowerCase() || null;
+  }
+
+  // 正文引用了、但用户没一起选中的本地图片。去重后按出现顺序返回。
+  function missingLocal(md) {
+    const out = [];
+    for (const g of Md.imgScan(md)) {
+      const k = localKey(g.url);
+      if (k && !local.has(k) && out.indexOf(k) < 0) out.push(k);
     }
+    return out;
+  }
+
+  async function grab(url) {
+    const key = localKey(url);
+    if (key) return local.get(key) || null;
     try {
       // HTML 里的 & 常常是转义过的，不还原的话图床会返回空响应且不报错
       const resp = await fetch(url.replace(/&amp;/g, '&'), { mode: 'cors', credentials: 'omit' });
@@ -158,15 +176,14 @@
   //
   // 按图片把 Markdown 切成段：文字段落走 text/html 一次性粘贴，图片段落单独上传。
   // 不用占位符再回填，是因为每次粘贴后光标本来就停在新内容末尾，顺着贴下去就是原文顺序。
+  // 用 imgScan 而不是直接 exec：代码块里写的 ![](…) 是例子不是图片，见 md2html.js
   function segments(md) {
-    const re = Md.imgRe();
     const out = [];
     let last = 0;
-    let m;
-    while ((m = re.exec(md))) {
-      out.push({ img: false, text: md.slice(last, m.index) });
-      out.push({ img: true, alt: m[1], url: m[2] });
-      last = m.index + m[0].length;
+    for (const g of Md.imgScan(md)) {
+      out.push({ img: false, text: md.slice(last, g.index) });
+      out.push({ img: true, alt: g.alt, url: g.url });
+      last = g.index + g.len;
     }
     out.push({ img: false, text: md.slice(last) });
     return out.filter((s) => s.img || s.text.trim());
@@ -246,12 +263,12 @@
     if (!sticky) toastEl.__t = setTimeout(() => { toastEl.remove(); toastEl = null; }, 3600);
   }
 
-  function pickFiles() {
+  function pickFiles(accept) {
     return new Promise((resolve) => {
       const inp = document.createElement('input');
       inp.type = 'file';
       inp.multiple = true; // .md 之外还可以带上它引用的本地图片
-      inp.accept = '.md,.markdown,.txt,image/*';
+      inp.accept = accept || '.md,.markdown,.txt,image/*';
       inp.style.cssText = 'position:fixed;left:-9999px';
       document.body.appendChild(inp);
       inp.addEventListener('change', () => {
@@ -260,6 +277,49 @@
         resolve(files);
       });
       inp.click();
+    });
+  }
+
+  // 缺图时不能直接再弹一次文件框：第一次选完文件不算「用户手势」，
+  // input.click() 会被浏览器静默拒掉。所以先摆一条带按钮的提示，
+  // 让用户自己点那一下——那一下才是真手势。
+  function askFiles(names) {
+    return new Promise((resolve) => {
+      const bar = document.createElement('div');
+      bar.style.cssText =
+        'position:fixed;left:50%;bottom:64px;transform:translateX(-50%);z-index:2147483647;' +
+        'background:rgba(15,20,25,.95);color:#fff;padding:12px 16px;border-radius:12px;' +
+        'font:500 14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;max-width:80vw;' +
+        'display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center';
+
+      const msg = document.createElement('div');
+      msg.textContent = T.need(names.length, names);
+      bar.appendChild(msg);
+
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:10px';
+      const mk = (label, bg, color) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = label;
+        b.style.cssText =
+          'border:0;border-radius:9999px;padding:7px 16px;cursor:pointer;font:inherit;' +
+          'background:' + bg + ';color:' + color;
+        row.appendChild(b);
+        return b;
+      };
+      const ok = mk(T.needBtn, 'rgb(244,33,46)', '#fff');
+      const skip = mk(T.needSkip, 'rgba(255,255,255,.14)', '#fff');
+      bar.appendChild(row);
+      document.body.appendChild(bar);
+
+      const close = (v) => { bar.remove(); resolve(v); };
+      ok.addEventListener('click', async () => {
+        ok.disabled = true;
+        const picked = await pickFiles('image/*');
+        close(picked);
+      });
+      skip.addEventListener('click', () => close([]));
     });
   }
 
@@ -274,6 +334,14 @@
 
     toast(T.reading, true);
     const md = await mdFile.text();
+
+    // 本地图片是最容易漏的一步：正文写的是相对路径，可这个文件框只拿得到被选中的文件。
+    // 漏了就只会降级成一行文字链接，用户还不知道为什么。所以点名把缺的要回来。
+    const missing = missingLocal(md);
+    if (missing.length) {
+      for (const f of await askFiles(missing)) local.set(f.name.toLowerCase(), f);
+    }
+
     let msg;
     try {
       msg = await run(md, (s) => toast(s, true));

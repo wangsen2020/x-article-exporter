@@ -208,11 +208,35 @@
       .replace(/^\s*>\s?/gm, '')
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1 ($2)');
 
+  // 把代码区域挖成等长的空白。长度不变，所以在挖过的副本上算出来的下标，
+  // 拿回原文照样对得上。
+  const maskCode = (md) =>
+    md
+      .replace(/```[\s\S]*?```/g, (m) => m.replace(/[^\n]/g, ' '))
+      .replace(/(^|[^`])(`[^`\n]*`)/g, (m, p, c) => p + c.replace(/[^\n]/g, ' '));
+
+  // 扫出正文里**真正**的图片，返回 [{index, len, alt, url}]。
+  //
+  // 为什么不直接拿 imgRe 去 exec 原文：讲 Markdown 的文章会把 ![](…) 写在反引号或
+  // ``` 围栏里当**例子**，那不是图片。照着改会把人家正文改烂——实测踩过：一篇讲这个
+  // 功能的文章，三处示例全被换成了「图1：01-xxx.png」这样的文字，句子当场读不通。
+  // 所以先挖掉代码区再找，位置从副本上取，内容回原文取。
+  const imgScan = (md) => {
+    const masked = maskCode(String(md || ''));
+    const re = /!\[([^\]]*)\]\(([^)\s]+)[^)]*\)/g;
+    const out = [];
+    let m;
+    while ((m = re.exec(masked))) out.push({ index: m.index, len: m[0].length, alt: m[1], url: m[2] });
+    return out;
+  };
+
   window.XAEMd = {
     toHtml: mdToHtml,
     strip: stripMd,
     hasMd: (s) => HAS_MD.test(String(s || '')),
     // 图片语法。分段插图时要按它切开 Markdown，所以一并导出，免得两处各写一遍。
+    // 注意：**别直接拿它 exec 正文**，代码块里的例子会被误判，走 imgScan。
     imgRe: () => /!\[([^\]]*)\]\(([^)\s]+)[^)]*\)/g,
+    imgScan: imgScan,
   };
 })();
