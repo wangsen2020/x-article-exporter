@@ -78,115 +78,6 @@ X 长文放不下的东西一律降级，宁可朴素也不丢字：表格 → `
 （文字不丢，只丢样式）。它的工具栏里也确实没有代码按钮。真机通过的是：三级标题、
 有序 / 无序列表（含嵌套 depth）、引用、粗体、斜体、链接。
 
-### Markdown → 知乎专栏（图片自动上传）
-
-进知乎写文章页（`zhuanlan.zhihu.com/write` 或 `/p/<id>/edit`），点工具栏「导入」，
-展开的菜单里多一条红色的 **「导入MD / 自动传图」**（原生两条是「导入文档 MD/Doc」和
-「导入链接 公众号」）。选一个 `.md`（可以连同它引用的本地图片一起多选），正文按顺序
-铺进去，**图片自动上传**——不用再一张张复制粘贴。
-
-菜单条目不是自己拼的，是**克隆一条原生条目再改内容**：知乎那些 `css-xxxxx` 类名是构建时
-哈希出来的，照抄迟早对不上；克隆连内边距、悬停态、字号一起继承。克隆出来的节点没有
-React fiber，所以知乎自己的点击处理不会被误触发。找不到「导入」时（改版）退回右下角
-红色悬浮球，免得彻底没入口。
-
-两个实测细节：浮层**只认 Esc**，合成的 pointerdown / mousedown / click 一概关不掉它；
-以及 observer 的合帧**不能用 `requestAnimationFrame`**——标签页不在前台时 rAF 冻结、
-`setInterval` 被节流到分钟级，两个一起哑火就等于没挂载，改用 `setTimeout`。
-
-能成立的前提是一条实测结论：**知乎的编辑器也是 Draft.js**。往它身上合成派发
-`ClipboardEvent('paste')`，只要 `clipboardData.files` 里有图片 `File`，知乎就会走它自己的
-上传流水线，把图传到 `pic-private.zhihu.com` 并插入 atomic/figure 块，和人手粘贴一模一样。
-同理 `text/html` 能一次铺好标题、列表、引用、代码块（知乎的 h1 会被压成 header-two）。
-
-图片来源两种：`http(s)` 链接在页面里直接 `fetch`（实测 `pbs.twimg.com` 带 CORS 头，拿得到
-blob）；相对路径则在用户一起选中的文件里按文件名找。抓不到的不阻塞，降级成一行
-「说明：原链接」，末尾报数。
-
-本地图片是最容易漏的一步——正文里写的是 `![图1](01-xxx.png)` 这种相对路径，而文件框
-只拿得到**被选中**的文件，漏选就静悄悄降级成一行文字。所以读完 `.md` 会先扫一遍，
-把引用了但没选中的文件名**点名列出来**再要一次。注意这里不能直接弹第二个文件框：
-第一次选完文件不算用户手势，`input.click()` 会被浏览器静默拒掉，必须先摆一条带按钮的
-提示，让用户自己点那一下。
-
-**为什么不用知乎自己的两个入口**（都实测过）：
-
-- 「识别到特殊格式 → 确认并解析」那条提示条：点下去整篇被压成**一个段落**，格式全丢。
-- 工具栏「导入」收 `.md`：文件确实传上了 OSS，但最后一步
-  `zhida.zhihu.com/api/v4/ai_ingress/community/editor/upload` 返回 **400**。
-
-两条都不稳，而且都不解决图片。粘贴这条路每一步都在自己手里。
-
-**一个必须绕开的坑**：粘贴进来的第一个元素总是并进光标所在的那个块，所以在非空块后面
-直接粘「整段只有一个 `<blockquote>`（或标题）」的片段，知乎会把它**整个吞掉**——实测块数
-一点不涨。修法是先敲一次回车造出空块：Draft 的 `insertFragment` 遇到空块是「替换」而不是
-「合并」，片段的第一个块就能带着自己的类型落地。
-
-### Markdown → CSDN（图片自动上传）
-
-进 CSDN 的 Markdown 编辑器（`editor.csdn.net/md`），点工具栏右边的「更多」，
-展开的菜单里多一条红色的 **「导入 MD（自动传图）」**（原生五条是撤销 / 重做 / 导入 /
-导出 / 模版）。用法和知乎那条一样：选一个 `.md`，可以连同它引用的本地图片一起多选。
-条目同样是**克隆一条原生 `button.more-actions-item` 再改内容**；找不到「更多」时退回
-右下角悬浮球。
-
-**比知乎简单一层**：CSDN 这个编辑器是 StackEdit 那一系
-（`<pre class="editor__inner" contenteditable>`），里面躺的**就是 Markdown 源码本身**。
-所以不需要 md → HTML，不需要按图片切段贴，也不用去够 React 内部状态——整件事退化成
-「把图换成 CSDN 直链，再把整篇文本一次性写进去」。
-
-传图的原理和知乎同源：合成派发 `ClipboardEvent('paste')`，`clipboardData.files` 里带一个
-图片 `File`，CSDN 就会走它自己的上传流水线，传到 `i-blog.csdnimg.cn` 并在光标处写下
-`![在这里插入图片描述](https://i-blog.csdnimg.cn/direct/<hash>.png)`。实测 2.1MB 的 PNG
-约 1.9s 传完，**没有中间占位态**。
-
-#### CSDN 自己会「外链图片转存」，为什么还要我们传
-
-会，而且是**服务端**去抓：粘一个 https 图片链接进来，它显示「外链图片转存中…」，抓到
-就换成 `i-blog.csdnimg.cn/img_convert/<hash>`。实测 `www.python.org` 的图 7 秒搞定。
-
-但**它的服务器够不着 `pbs.twimg.com`**——实测那条永远停在 `[外链图片转存中...(img-xxx)]`，
-连图片语法都不是了，发出去就是一行废字。而这个扩展导出的正文，图清一色是
-`pbs.twimg.com`。所以必须我们自己在浏览器里取、在浏览器里传：墙和防盗链是按
-「谁在发请求」算的，浏览器带着你的网络和身份，服务端没有。
-
-反过来，我们 `fetch` 不到的 https 图（多半是对方没给 CORS 头）就**原样留着**交给 CSDN
-转存，它服务端往往反而抓得到——两条路互补，不是二选一。所以完成提示把三种下场分开报：
-已上传 / 交给 CSDN 转存（结果还没出来）/ 没拿到已留成文字。
-
-#### 上传结果去网络层拿，别在正文里认
-
-CSDN 传完图会把 `![](url)` 写回编辑器，但**这一步是坏的**：在非空文档里连着传，
-第二张的回填会按旧偏移落到第一张身上，把 `![…](url)` 啃成光秃秃的
-「在这里插入图片描述」。实测 4 张连传，最后正文里一个链接都不剩。
-
-我先后误判成限流、误判成偶发（加了重试把它盖住，整篇从 13s 涨到 35s）。翻网络才看清：
-`upload/signature` 和华为云 OBS 两个 POST **全是 200**，服务端每张都成功，丢的只是写回
-编辑器那一步。原因是 CSDN 先插占位、传完再按记下的偏移替换回去，而合成 `paste` 不走它
-自己的选区更新（DOM `Range` 挪光标它不认，等 `selectionchange` 也没用），偏移就是旧的。
-
-**也别指望换个触发方式能躲开。** 往 CSDN 自己的 `input[type=file]` 里塞
-`dt.files` 再派发 `change`（这条路本身是通的，上传照样成功），结果一模一样烂——
-坏的是回填，不是触发方式。这条实测过了，别再试第二遍。
-
-真正的解法是**根本不去正文里认结果**。那个 OBS 响应里直接就带最终直链：
-
-```json
-{"code":200,"data":{"imageUrl":"https://i-blog.csdnimg.cn/direct/<hash>.png","width":"300","height":"200"}}
-```
-
-所以挂一层只读的 `fetch` / `XHR` 钩子，把 `data.imageUrl` 收下来就行。换来三件事：
-
-- **不用为了躲覆盖而清空编辑器**——用户正在写的东西全程原样待着（早期版本会在每张图之前
-  清空，那意味着上传期间用户的草稿是空的，中途一崩就得靠 `catch` 抢救）；
-- **判定是精确的**：有 `imageUrl` 就是成了，OBS 回了却没有就是没成。不再需要
-  「正文变过又稳住 2 秒」那种靠猜的启发式，也不需要重试兜底；
-- **快**：每张稳定 1 秒，整篇 5 图 8 秒。
-
-另外一条：**选中全文后直接 paste 覆盖不掉选区**（它走自己的选区模型，结果是追加而不是
-替换），必须先 `execCommand('delete')` 清空再 paste。清空走 `execCommand` 而不是自己改
-DOM，也是同一个道理——`execCommand` 过的是浏览器编辑管线，编辑器的内部模型跟得上。
-
 ### 油猴脚本 / 书签小工具
 
 `x-article-exporter.user.js` 拖进 Tampermonkey；或把 `bookmarklet.txt` 全部内容粘进书签网址栏。
@@ -301,9 +192,7 @@ X Article 的正文只在**文章自身的滚动范围内**不虚拟化。一旦
 |---|---|
 | `extract.js` | 抽取、渲染、按钮挂载；定义 `window.__XAE_RUN(mode)`（MAIN world） |
 | `compose.js` | Markdown → Draft.js 粘贴注入，长文编辑页的图标（MAIN world） |
-| `zhihu.js` | Markdown 一键灌进知乎专栏，图片自动上传（MAIN world，zhuanlan.zhihu.com） |
-| `csdn.js` | Markdown 一键灌进 CSDN，图片自动上传（MAIN world，editor.csdn.net） |
-| `md2html.js` | Markdown → Draft 认得的 HTML，compose.js 和 zhihu.js 共用 |
+| `md2html.js` | Markdown → Draft 认得的 HTML，compose.js 用 |
 | `net-hook.js` | GraphQL 网络拦截（MAIN world，`document_start`） |
 | `bridge.js` | 隔离世界中继，MAIN ↔ 后台（MAIN 没有 `chrome.*`） |
 | `background.js` | `chrome.debugger` + `printToPDF` |
@@ -311,6 +200,15 @@ X Article 的正文只在**文章自身的滚动范围内**不虚拟化。一旦
 | `extract.min.js` / `bookmarklet.txt` | 书签小工具 |
 | `x-article-exporter.user.js` | 油猴脚本 |
 | `test-renderRich.js` | 富文本渲染单元测试，`node test-renderRich.js` |
+
+## 相关项目
+
+「合成 paste 借编辑器自己的上传流水线」这套思路后来拆成了两个独立的零权限扩展：
+
+- [csdn-md-importer](https://github.com/wangsen2020/csdn-md-importer) —— Markdown 一键灌进 CSDN 编辑器，图片自动上传
+- [zhihu-md-importer](https://github.com/wangsen2020/zhihu-md-importer) —— Markdown 一键灌进知乎专栏，图片自动上传
+
+本仓库专注做好 X 一件事：Article 长文 / 推文串导出，以及 Markdown 导入 X 长文编辑器。
 
 ## License
 

@@ -41,8 +41,8 @@
         fail: 'Conversion did not apply — body unchanged',
       };
 
-  // Markdown → HTML 在 md2html.js 里（知乎那边也用同一份）。它是同一个 MAIN world
-  // 的前一个内容脚本，正常一定先跑完；真没有就安静退出，别在页面上留个点了没反应的图标。
+  // Markdown → HTML 在 md2html.js 里。它是同一个 MAIN world 的前一个内容脚本，
+  // 正常一定先跑完；真没有就安静退出，别在页面上留个点了没反应的图标。
   const Md = window.XAEMd;
   if (!Md) return;
   const mdToHtml = Md.toHtml;

@@ -1,9 +1,9 @@
 /*!
  * X Article Exporter — Markdown → HTML（共享）
  *
- * 两个地方都要用：X 的长文编辑器（compose.js）和知乎的文章编辑器（zhihu.js）。
- * 两家的编辑器底层都是 Draft.js，而 Draft 唯一对外开放的富文本入口是 paste ——
- * 它的 editOnPaste 读 clipboardData 里的 text/html，用自己的转换器解析成块。
+ * X 的长文编辑器（compose.js）要用：它底层是 Draft.js，而 Draft 唯一对外开放
+ * 的富文本入口是 paste —— 它的 editOnPaste 读 clipboardData 里的 text/html，
+ * 用自己的转换器解析成块。
  * 所以这里只干一件事：把 Markdown 变成一份「Draft 认得的 HTML」。
  *
  * 产出刻意只用最朴素的标签（h1-h3 / p / ul / ol / li / blockquote / pre>code /

@@ -42,11 +42,11 @@
     <g transform="translate(951 170)" filter="url(#shadow)">
       <rect width="250" height="306" rx="18" fill="#101c25" stroke="#2c5269" stroke-width="2"/>
       <circle cx="42" cy="45" r="23" fill="#173a50"/><path d="M31 38h22v18H40l-9 8v-8Z" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linejoin="round"/><path d="M37 45h10m-10 6h7" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round"/>
-      <text x="28" y="104" fill="#f8fafc" font-size="23" font-weight="700">Markdown 工作流</text>
-      <text x="28" y="136" fill="#b7c6d3" font-size="16">从编辑到多平台发布辅助</text>
+      <text x="28" y="104" fill="#f8fafc" font-size="23" font-weight="700">Markdown 导入</text>
+      <text x="28" y="136" fill="#b7c6d3" font-size="16">写好的 Markdown 一键排版</text>
       <path d="M37 184h61m-61 22h61m25-11h58" stroke="#7090a5" stroke-width="8" stroke-linecap="round"/>
       <path d="m105 173 12 11-12 11m-1 0 12 11-12 11" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-      <text x="28" y="279" fill="#7dd3fc" font-size="15" font-weight="650">X / 知乎 / CSDN</text>
+      <text x="28" y="279" fill="#7dd3fc" font-size="15" font-weight="650">粘进 X 长文编辑器自动排版</text>
     </g>
     <text x="66" y="548" fill="#8fa7b8" font-size="16">所有处理在浏览器工作流中完成；PDF 使用 Chrome DevTools Protocol 生成。</text>
   </g>
