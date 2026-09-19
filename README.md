@@ -25,6 +25,8 @@
 2. 打开任意 X 长文 / 推文串页面
 3. 点帖子操作栏里的 **PDF** 按钮（在书签、分享图标旁边）——**只有 X 长文（Article）才有这个图标**
 
+![帖子操作栏里的 PDF 导出按钮，紧挨着书签和分享图标](docs/shot_pdf_button.png)
+
 - **左键** = 导出 PDF（静默生成，落到下载列表）
 - **右键** = 导出自包含 HTML（图片内联为 data URI，可离线打开）
 - 也可以点浏览器工具栏上的扩展图标，效果同左键
@@ -44,6 +46,8 @@
 进 `x.com/compose/articles/edit/<id>`，**Preview 按钮左边**多一个图标。把 Markdown 原样
 贴进正文框，点一下图标：正文就地变成 X 长文自己的排版（标题 / 列表 / 引用 / 代码块 /
 粗斜体 / 链接）。没有确认弹窗，转错了按 **Ctrl+Z** —— 走的是 Draft 自己的编辑历史。
+
+![长文编辑器工具栏，Preview 左边多出来的红色 Markdown 导入图标](docs/shot_md_toolbar.png)
 
 实现的关键是**不要碰 DOM**。X 的长文编辑器是 Draft.js，真身是内存里的 ContentState，
 contenteditable 只是投影——塞 innerHTML 不但不认，下一次 setState 还会把它抹掉。
