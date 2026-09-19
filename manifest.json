@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "X Article → PDF",
+  "name": "X Article → PDF - X/Twitter 长文推文导出",
   "version": "2.5.0",
-  "description": "把 X (Twitter) 的 Article 长文或推文串导出为 PDF / Markdown / 自包含 HTML，并在本地留一份快照存档——原帖被删也还看得到。",
+  "description": "把 X (Twitter) 的 Article 长文、推文串一键导出为可搜索 PDF / Markdown / 自包含 HTML，支持本地快照归档与 Markdown 一键排版进长文编辑器，原帖被删也还看得到。",
   "permissions": [
     "debugger",
     "downloads",
