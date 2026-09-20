@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "X Artigo para PDF - Exportar threads e artigos do X/Twitter",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Exporte artigos e threads do X para PDF pesquisável, Markdown ou HTML. Importe Markdown no editor do X. Arquivo offline incluso.",
+    "description": "Extension description"
+  }
+}

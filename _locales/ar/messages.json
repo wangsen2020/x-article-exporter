@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "X مقالة إلى PDF - تصدير سلاسل ومقالات X/Twitter",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "صدّر مقالات وسلاسل X إلى PDF قابل للبحث أو Markdown أو HTML. استورد Markdown إلى محرر X، مع أرشيف محلي بدون اتصال.",
+    "description": "Extension description"
+  }
+}

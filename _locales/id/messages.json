@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "X Artikel ke PDF - Ekspor Thread & Artikel X/Twitter",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Ekspor Artikel & thread X ke PDF, Markdown, atau HTML. Impor Markdown ke editor X. Termasuk arsip offline lokal.",
+    "description": "Extension description"
+  }
+}

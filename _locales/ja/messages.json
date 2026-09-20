@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "X記事→PDF変換 - X/Twitterのスレッド・記事をエクスポート",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Xの長文・スレッドを検索可能なPDF/Markdown/HTMLに変換。Markdownを記事エディタへ取込み、オフライン保存も可能。",
+    "description": "Extension description"
+  }
+}

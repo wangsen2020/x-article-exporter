@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "X Article to PDF - Export X/Twitter Threads & Articles",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "Export X (Twitter) Articles & threads to searchable PDF, Markdown or HTML. Import Markdown into X's editor. Offline archive too.",
+    "description": "Extension description"
+  }
+}
