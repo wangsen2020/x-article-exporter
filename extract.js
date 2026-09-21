@@ -36,10 +36,15 @@
   // 所以这个函数必须在**点击时**调用，不能在挂按钮时算好存起来。
   function ctxFromArticle(root) {
     if (!root) return null;
-    const link = [...root.querySelectorAll('a[href*="/status/"]')]
-      .map((a) => a.getAttribute('href') || '')
-      .find((h) => /^\/[^/]+\/status\/\d+$/.test(h)) || '';
-    const m = link.match(/^\/([^/]+)\/status\/(\d+)$/) || [];
+    // 后缀要放行：帖子自己的固定链接常常带 /analytics、/photo/1 这类尾巴。
+    const parse = (h) => h.match(/^\/([^/]+)\/status\/(\d+)(?:\/|$)/);
+    const hits = [...root.querySelectorAll('a[href*="/status/"]')]
+      .map((a) => parse(a.getAttribute('href') || ''))
+      .filter(Boolean);
+    // 长文正文里可以嵌别人的推文，它们的链接往往排在本帖固定链接前面，
+    // 所以在详情页先认 URL 里的那条，认不到再退回第一条。
+    const focalId = (location.pathname.match(/\/status\/(\d+)/) || [])[1] || '';
+    const m = (focalId && hits.find((x) => x[2] === focalId)) || hits[0] || [];
     const id = m[2] || '';
     const handle = m[1] || '';
     return {
