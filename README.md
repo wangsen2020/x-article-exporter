@@ -1,6 +1,13 @@
 <p align="center">
+  <b>English</b> ·
+  <a href="README.zh-CN.md">简体中文</a> ·
+  <a href="README.es.md">Español</a> ·
+  <a href="README.pt-BR.md">Português (Brasil)</a>
+</p>
+
+<p align="center">
   <a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">
-    <img src="docs/readme_hero.jpg" alt="X Article → PDF — 从 Chrome 网上应用店免费安装 / Install free from the Chrome Web Store">
+    <img src="docs/readme_hero.jpg" alt="X Article → PDF — install free from the Chrome Web Store">
   </a>
 </p>
 
@@ -9,12 +16,7 @@
 </p>
 
 <p align="center">
-  <b><a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">从 Chrome 网上应用店一键安装</a></b>
-  &nbsp;·&nbsp;
-  <b><a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">Install from the Chrome Web Store</a></b>
-  <br>
-  免费 · 不用克隆、不用打包、不用开开发者模式 · 自动更新 · Edge 也能装
-  <br>
+  <b><a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">Install from the Chrome Web Store</a></b><br>
   Free · no clone, no build, no developer mode · auto-updates · works in Edge too
 </p>
 
@@ -26,223 +28,246 @@
 
 # X Article → PDF
 
-把 X (Twitter) 的 **Article 长文**或**推文串**导出为保留排版的 PDF——
-文字可选中可搜索、图片原图分辨率、直接进浏览器下载列表，不弹打印对话框、不开新标签页。
+Export an X (Twitter) **Article** or **thread** to a PDF that keeps its layout —
+selectable, searchable text and full-resolution images, saved straight to your downloads.
+No print dialog, no new tab.
 
-也可以导出为图片全部内联的自包含 HTML，用于离线归档。
+You can also export a self-contained HTML file with every image inlined, for offline archiving.
 
-## 功能 / Features
+## Features
 
-![X Article → PDF 核心能力概览](docs/features.svg)
+![X Article → PDF feature overview](docs/features.en.svg)
 
-## 用法
+## Usage
 
-### Chrome 扩展（推荐）
+### Chrome extension (recommended)
 
-1. 从 **[Chrome 网上应用店](https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn)** 安装（Edge 也可以直接从这里装）
-2. 打开任意 X 长文 / 推文串页面
-3. 点帖子操作栏里的 **PDF** 按钮（在书签、分享图标旁边）——**只有 X 长文（Article）才有这个图标**
+1. Install it from the **[Chrome Web Store](https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn)** (Edge can install it from there too)
+2. Open any X Article or thread
+3. Click the **PDF** button in the post's action bar (next to bookmark and share) — **it only appears on X Articles**
 
-![帖子操作栏里的 PDF 导出按钮，紧挨着书签和分享图标](docs/shot_pdf_button.png)
+![The PDF export button in the post action bar, next to bookmark and share](docs/shot_pdf_button.png)
 
-- **左键** = 导出 PDF（静默生成，落到下载列表）
-- **右键** = 导出自包含 HTML（图片内联为 data URI，可离线打开）
-- 也可以点浏览器工具栏上的扩展图标，效果同左键
+- **Left-click** = export PDF (generated silently, lands in your downloads)
+- **Right-click** = export self-contained HTML (images inlined as data URIs, opens offline)
+- Clicking the extension's toolbar icon does the same as a left-click
 
-按钮是纯图标、红色、无圆形背景，跟随 X 原生规格（viewBox 24×24、18.75px、`fill` 而非 `stroke`）。
-对齐要点：操作栏是 `align-items:stretch`，兄弟节点高 47px，**给按钮固定高度会变成顶端对齐**，
-图标中心比原生图标高约 7px；必须用 `align-self:stretch` 跟着撑满。
-文案在 hover 提示和 `aria-label` 里，全部走 `extract.js` 顶部的 `I18N` 表。
-加一种语言只需往 `I18N` 里加一个键，不用碰任何 DOM 结构。目前内置 `zh` / `en`，
-按 `navigator.language` 自动选。
+The button is icon-only, red, with no round background, matching X's native spec (24×24 viewBox,
+18.75px, `fill` rather than `stroke`). Alignment gotcha: the action bar is `align-items:stretch` with
+47px-tall siblings, so **giving the button a fixed height top-aligns it** and puts the icon about 7px
+above the native ones; it has to use `align-self:stretch` instead.
+The copy lives in the hover tooltip and `aria-label`, all driven by the `I18N` table at the top of
+`extract.js`. Adding a language means adding one key to `I18N` — no DOM changes. `zh` and `en` are
+built in, picked from `navigator.language`.
 
-> **推文串**场景：装完扩展后**刷新一次页面**再导出。网络拦截器只能捕获它装好之后
-> 发出的请求，当前页面的 `TweetDetail` 早就发完了。捕获不到会自动降级抓 DOM 并提示。
+> **Threads:** after installing, **reload the page once** before exporting. The network hook can only
+> capture requests made after it was installed, and the current page's `TweetDetail` has already been
+> sent. If nothing was captured the exporter falls back to scraping the DOM and tells you so.
 
-### 从源码加载（开发者）
+### Load from source (developers)
 
-只有想改代码、或者要跑商店里还没发布的版本时才需要：
-`chrome://extensions` → 打开「开发者模式」→「加载已解压的扩展程序」→ 选中本仓库目录。
-普通使用请直接走上面的商店安装，能自动更新。
+Only needed if you want to change the code or run a version that isn't in the store yet:
+`chrome://extensions` → turn on **Developer mode** → **Load unpacked** → pick this repository folder.
+For normal use, install from the store above — it updates automatically.
 
-### Markdown → 长文编辑器（写的方向）
+### Markdown → Article editor (the writing direction)
 
-进 `x.com/compose/articles/edit/<id>`，**Preview 按钮左边**多一个图标。把 Markdown 原样
-贴进正文框，点一下图标：正文就地变成 X 长文自己的排版（标题 / 列表 / 引用 / 代码块 /
-粗斜体 / 链接）。没有确认弹窗，转错了按 **Ctrl+Z** —— 走的是 Draft 自己的编辑历史。
+Open `x.com/compose/articles/edit/<id>` and you'll see an extra icon **to the left of Preview**. Paste
+your Markdown into the body as-is and click the icon: the body turns into X's own Article formatting
+in place (headings / lists / quotes / code blocks / bold and italic / links). There's no confirmation
+dialog — if it goes wrong, press **Ctrl+Z**; it uses Draft's own edit history.
 
-![长文编辑器工具栏，Preview 左边多出来的红色 Markdown 导入图标](docs/shot_md_toolbar.png)
+![The Article editor toolbar with the red Markdown import icon to the left of Preview](docs/shot_md_toolbar.png)
 
-实现的关键是**不要碰 DOM**。X 的长文编辑器是 Draft.js，真身是内存里的 ContentState，
-contenteditable 只是投影——塞 innerHTML 不但不认，下一次 setState 还会把它抹掉。
-Draft 唯一对外开放的富文本入口是 `paste`：它的 `editOnPaste` 读 `clipboardData` 里的
-`text/html`，用自己的转换器解析。所以做法是 Markdown → 一份 Draft 认得的 HTML →
-合成一次 `ClipboardEvent('paste')`。
+The key is **not touching the DOM**. X's Article editor is Draft.js: the real document is an in-memory
+ContentState and the contenteditable is only a projection — injected innerHTML is ignored, and the next
+setState wipes it anyway. Draft's only public rich-text entry point is `paste`: its `editOnPaste` reads
+`text/html` from `clipboardData` and parses it with its own converter. So the approach is Markdown →
+HTML that Draft understands → a synthetic `ClipboardEvent('paste')`.
 
-三个实测结论（Draft 0.11.7，见 `compose.js` 注释）：
+Three findings from testing (Draft 0.11.7, see the comments in `compose.js`):
 
-- **要接的是组件实例，不是 props**。React 双缓冲两棵 fiber 树，DOM 节点上挂的
-  `__reactFiber$` 常常指着旧的那棵，`memoizedProps.editorState` 会慢一拍——实测读出来是
-  「空文档」，而同一时刻实例上的 `_latestEditorState` 是最新的。读状态用它，写回用
-  实例的 `update()`，那正是 Draft 内部改状态走的同一个口子。
-- **嵌套列表只认「子列表是父列表的兄弟」**：`<ul><li>B</li><ul><li>B1</li></ul></ul>` 给出
-  `depth:1`；写成 `<li>B<ul>…</ul></li>` 会塌成一块 `BB1`（而后者恰好是大多数 Markdown
-  库的默认输出）。
-- **DOM 选区对 Draft 无效**：`Range` 和 `execCommand('selectAll')` 都改不动它（后者还返回
-  true），粘贴照样插在它自己记着的光标处。要整篇替换只能 `forceSelection` 撑开它的选区。
+- **Hook the component instance, not the props.** React double-buffers two fiber trees, and the
+  `__reactFiber$` on a DOM node often points at the stale one, so `memoizedProps.editorState` lags a
+  step behind — in practice it read as an empty document while the instance's `_latestEditorState` was
+  current. Read state from that, and write back through the instance's `update()`, the same path Draft
+  uses internally.
+- **Nested lists only work as "child list is a sibling of the parent list"**:
+  `<ul><li>B</li><ul><li>B1</li></ul></ul>` gives `depth:1`; `<li>B<ul>…</ul></li>` collapses into a
+  single `BB1` block (and the latter is what most Markdown libraries emit by default).
+- **DOM selection means nothing to Draft**: neither `Range` nor `execCommand('selectAll')` moves it (the
+  latter even returns true); a paste still lands at the cursor Draft remembers. Replacing the whole
+  body requires stretching its selection with `forceSelection`.
 
-转完一次之后正文里已经没有任何标记了，这时再点会把整篇当大白文重排成清一色段落——
-所以没有 Markdown 标记就直接不动，顺带挡住误点。
+After one conversion the body contains no markup anymore; clicking again would re-flow the whole
+article as plain paragraphs — so if there's no Markdown syntax the icon does nothing, which also guards
+against accidental clicks.
 
-图标插在 Preview 左边。**Preview 不是 `<button>`，也没有 `role="button"`，它是
-`<a role="link">`**——第一版只在 button / role=button 里找，真实编辑页 0 命中，图标退回了
-右下角悬浮。所以现在不认标签只认文字：找到「整个元素就只有 Preview 这几个字」的叶子
-节点，往上爬到文本仍然只有这几个字的最外层，插在它前面。
+The icon sits left of Preview. **Preview is not a `<button>` and has no `role="button"` — it's an
+`<a role="link">`.** The first version only searched buttons and role=button, got zero hits on the real
+editor, and the icon fell back to floating in the bottom-right. So now it matches on text, not tags:
+find the leaf whose entire text is "Preview", climb to the outermost ancestor whose text is still just
+that, and insert before it.
 
-X 长文放不下的东西一律降级，宁可朴素也不丢字：表格 → `甲 | 1` 的普通段落，
-分隔线 → 一行 `— — —`，图片 → 链接（X 的图必须走它自己的上传）。
+Whatever an X Article can't hold is downgraded — plain beats lost text: tables → plain paragraphs like
+`A | 1`, horizontal rules → a `— — —` line, images → links (X images must go through its own upload).
 
-**代码块 X 不支持**：真机实测 ```` ``` ```` 围栏和行内 `` ` `` 都会落成普通段落 / 普通文字
-（文字不丢，只丢样式）。它的工具栏里也确实没有代码按钮。真机通过的是：三级标题、
-有序 / 无序列表（含嵌套 depth）、引用、粗体、斜体、链接。
+**X doesn't support code blocks**: tested on the real editor, ```` ``` ```` fences and inline `` ` `` both
+land as plain paragraphs / plain text (the text survives, only the styling is lost). Its toolbar has no
+code button either. What passed on the real editor: three heading levels, ordered and unordered lists
+(including nested depth), quotes, bold, italic and links.
 
-### 油猴脚本 / 书签小工具
+### Userscript / bookmarklet
 
-`x-article-exporter.user.js` 拖进 Tampermonkey；或把 `bookmarklet.txt` 全部内容粘进书签网址栏。
+Drag `x-article-exporter.user.js` into Tampermonkey, or paste the whole of `bookmarklet.txt` into a
+bookmark's URL field.
 
-这两种形态**没有扩展后台**，拿不到 `chrome.debugger`，所以 PDF 请求会在 2.5s 后超时并
-自动改为下载自包含 HTML。书签小工具还因为注入太晚装不上网络拦截器，推文串只能走 DOM 降级。
+Neither form has an **extension backend**, so there's no `chrome.debugger`: a PDF request times out
+after 2.5s and falls back to downloading self-contained HTML. The bookmarklet also injects too late to
+install the network hook, so threads can only use the DOM fallback.
 
-## 三条硬约束（都是实测踩出来的，改代码前先读）
+## Three hard constraints (all learned the hard way — read before changing the code)
 
-### 1. 预滚动必须停在文章底部，绝不能滚到 document 底
+### 1. Pre-scrolling must stop at the bottom of the article, never the bottom of the document
 
-X Article 的正文只在**文章自身的滚动范围内**不虚拟化。一旦滚进评论区，
-整篇正文会被从 DOM 卸载：
+An X Article's body is only non-virtualized **within the article's own scroll range**. As soon as you
+scroll into the replies, the whole body is unloaded from the DOM:
 
-| 指标 | 滚到 document 底 | 滚到文章底 |
+| Metric | Scrolled to document bottom | Scrolled to article bottom |
 |---|---|---|
-| 正文块数 | **0**（正文被卸载，根 article 元素也被换掉） | **136** |
-| 正文配图 | 0，且混入评论区的图 | **11** |
-| 滚动终点 | 27354 | **17529** |
+| Body blocks | **0** (body unloaded, root article element replaced) | **136** |
+| Body images | 0, mixed with images from replies | **11** |
+| Scroll end | 27354 | **17529** |
 
-所以 `loadArticle()` 每轮重算 `articleRoot().getBoundingClientRect().bottom + scrollY`
-作为上限，并留半屏余量。另外正文渲染出来之前这个高度是 0，会把上限算成负数——
-必须先等 `.longform-unstyled` 出现再开始。
+So every round, `loadArticle()` recomputes `articleRoot().getBoundingClientRect().bottom + scrollY` as
+the upper bound and keeps half a screen of margin. Before the body renders that height is 0, which
+would make the bound negative — it has to wait for `.longform-unstyled` to appear first.
 
-### 2. 所有选择器必须限定在正文根 article 内
+### 2. Every selector must be scoped to the body's root article
 
-全文档选择会把评论区的配图当成正文插图抽进来，配合约束 1 的正文卸载问题会抽出一锅混合物。
+Selecting across the whole document pulls reply images in as body illustrations; combined with the
+unloading in constraint 1, you get a mixed-up mess.
 
-### 2b. 封面图去重不能用字符串 includes
+### 2b. Cover de-duplication can't use string `includes`
 
-`parts` 里的 URL 已经过 `esc()`（`&` → `&amp;`），拿未转义的原始 URL 去 `includes` 比对
-**永远匹配不上**，封面会被重复插入一次。实测某篇文章封面 URL 含 `&`，
-旧逻辑 100% 复现重复。现在改用抽取过程中收集的原始 URL `Set` 判重。
+URLs in `parts` have already been through `esc()` (`&` → `&amp;`), so an `includes` check with the raw,
+unescaped URL **never matches** and the cover gets inserted twice. One real article had a cover URL
+containing `&` and the old logic reproduced the duplicate 100% of the time. De-duplication now uses a
+`Set` of raw URLs collected during extraction.
 
-### 3. 不要在页面里调 print()
+### 3. Don't call print() in the page
 
-新开的同源标签页和 x.com **共用渲染进程**，大文档的打印预览会把原页面主线程一起冻住
-（表现为页面完全卡死、滚轮无响应）。所以现在：
+A newly opened same-origin tab **shares the renderer process** with x.com, so a large document's print
+preview freezes the original page's main thread too (the page locks up, the wheel stops responding).
+So now:
 
-- PDF 渲染放在**扩展页面**（`chrome-extension://` 源，独立进程）里做
-- 传给它的文档保持「远程图片链接」的轻量形态（几十 KB），只有导出 HTML 时才内联图片
+- PDF rendering happens in an **extension page** (`chrome-extension://` origin, separate process)
+- The document handed to it stays lightweight with remote image links (tens of KB); images are only
+  inlined when exporting HTML
 
-## 两条抽取路径
+## Two extraction paths
 
-### Article 长文 —— 抓 DOM
+### X Article — scrape the DOM
 
-用 `.longform-unstyled` / `.longform-header-one` / `.longform-header-two` /
-`.longform-blockquote` / `.longform-ordered-list-item` / `[data-testid="tweetPhoto"]`
-作锚点，还原成 `<p> <h2> <h3> <blockquote> <ol> <figure>`。
+Anchored on `.longform-unstyled` / `.longform-header-one` / `.longform-header-two` /
+`.longform-blockquote` / `.longform-ordered-list-item` / `[data-testid="tweetPhoto"]`, rebuilt as
+`<p> <h2> <h3> <blockquote> <ol> <figure>`.
 
-加粗必须走 computed style：**X 不用 `<strong>`，加粗是 CSS class 做的**；
-而且 `font-weight` 会继承，要和父元素比较，否则会抽出嵌套重复的 `<strong>`。
+Bold has to come from computed style: **X doesn't use `<strong>`; bold is a CSS class**. And
+`font-weight` inherits, so it must be compared with the parent, or you extract nested duplicate
+`<strong>` tags.
 
-### 推文串 —— 拦 GraphQL
+### Threads — intercept GraphQL
 
-推文串在 DOM 里是虚拟列表，抓 DOM 必然丢内容。`net-hook.js` 在 `document_start`
-抢在 X 自己的请求之前装好 fetch / XHR 拦截，缓存 `TweetDetail` 响应，
-导出时直接从结构化 JSON 重建。这条路径还能拿到 DOM 里已经损失的信息：
+Threads are a virtualized list in the DOM, so scraping the DOM always loses content. `net-hook.js` runs
+at `document_start`, installs fetch / XHR interception before X's own requests go out, caches the
+`TweetDetail` responses, and export rebuilds the thread straight from the structured JSON. This path
+also recovers information the DOM has already lost:
 
-| 字段 | 拿到了什么 |
+| Field | What you get |
 |---|---|
-| `note_tweet.richtext.richtext_tags` | 长推文加粗 / 斜体的精确区间 |
-| `note_tweet.media.inline_media` | 正文中间内嵌图片及其插入位置 |
-| `entities.urls[].expanded_url` | 链接真实地址（DOM 里只有 t.co 短链） |
-| `extended_entities.media` | 原始媒体，不受显示尺寸影响 |
+| `note_tweet.richtext.richtext_tags` | Exact bold / italic ranges in long posts |
+| `note_tweet.media.inline_media` | Images embedded mid-text and where they go |
+| `entities.urls[].expanded_url` | Real link targets (the DOM only has t.co short links) |
+| `extended_entities.media` | Original media, independent of display size |
 
-**所有下标都是码点（code point），不是 UTF-16 code unit。**
-中文和 emoji 下按 `string.length` 切会整体错位，必须先 `Array.from()`。
-`node test-renderRich.js` 有 11 条单元测试覆盖这块。
+**Every index is a code point, not a UTF-16 code unit.**
+With CJK text and emoji, slicing by `string.length` shifts everything — you have to `Array.from()`
+first. `node test-renderRich.js` covers this with 11 unit tests.
 
-## PDF 是怎么生成的
+## How the PDF is generated
 
-`chrome.debugger` + `Page.printToPDF`。这是扩展里**唯一**能拿到
-「真 PDF、矢量文字、无打印对话框、不开可见标签页」的途径。
+`chrome.debugger` + `Page.printToPDF`. It's the **only** way for an extension to get a real PDF with
+vector text, no print dialog and no visible tab.
 
-代价：Chrome 会显示一条 **「"X Article → PDF" 已开始调试此浏览器」** 的横幅。
-这是 Chrome 的强制提示，无法去掉。横幅出现期间 DevTools 不能用（反之亦然）。
+The cost: Chrome shows a **"X Article → PDF" started debugging this browser** banner. Chrome forces it
+and it can't be removed. While the banner is up, DevTools can't be used (and vice versa).
 
-流程：内容脚本把轻量 HTML 交给后台 → 后台在**后台标签页**里打开扩展页面渲染 →
-等图片解码完 → `printToPDF` → 页面用 `<a download>` 触发下载 → 关掉标签页。
-全程不切走你当前的页面。
+Flow: the content script hands lightweight HTML to the background → the background opens an extension
+page in a **background tab** to render it → waits for images to decode → `printToPDF` → the page
+triggers the download with `<a download>` → the tab closes. Your current page is never switched away.
 
-如果 debugger 附加失败（DevTools 已打开、企业策略限制等），**不会弹打印对话框**——
-直接改为下载自包含 HTML 并提示原因。整条链路里任何一步都不会打断你手上的操作。
+If attaching the debugger fails (DevTools already open, enterprise policy, etc.), **no print dialog
+appears** — it downloads self-contained HTML instead and tells you why. Nothing in the chain interrupts
+what you're doing.
 
-## 其他已知坑
+## Other known pitfalls
 
-- **必须保持页面在前台**。后台标签页 Chrome 不加载懒加载图片（实测滚了 23 轮图片数
-  一直是 0，一强制重绘立刻变 14 张），脚本会先等你切回来。
-- **fetch 图片前要把 `&amp;` 还原成 `&`**。HTML 转义过的 URL 直接拿去 fetch，
-  X 图床会返回空响应且**不报错**，内联出来是一堆空图。
-- **注入必须落在 MAIN world**。缓存的 GraphQL 数据挂在页面的 `window` 上，
-  隔离世界读不到；图片 fetch 也需要页面自己的 x.com 源才有 CORS。
-  MAIN world 没有 `chrome.*` API，所以用 `bridge.js`（隔离世界）做 postMessage 中转。
-- X 随时可能改版。Article 路径会变的是 `ART_SEL` 那几个 class；
-  推文串路径会变的是 GraphQL 字段结构（`collectFromGQL` / `userOf` 已兼容新旧 schema）。
+- **Keep the page in the foreground.** Chrome doesn't load lazy images in background tabs (in testing,
+  23 scroll rounds kept the image count at 0; forcing a repaint jumped it to 14), so the script waits
+  for you to switch back.
+- **Turn `&amp;` back into `&` before fetching images.** Fetching an HTML-escaped URL makes X's image
+  host return an empty response **without an error**, and the inlined result is a pile of blank images.
+- **Injection must be in the MAIN world.** The cached GraphQL data hangs off the page's `window`, which
+  the isolated world can't read; image fetches also need the page's own x.com origin for CORS.
+  The MAIN world has no `chrome.*` API, so `bridge.js` (isolated world) relays via postMessage.
+- X can change at any time. On the Article path, what breaks is the handful of classes in `ART_SEL`;
+  on the thread path, the GraphQL field structure (`collectFromGQL` / `userOf` already handle both the
+  old and new schema).
 
-## 尚未验证
+## Not yet verified
 
-以下部分只有代码和推理，**没有跑通过端到端**：
+The following only has code and reasoning behind it and **has not been run end to end**:
 
-- `chrome.debugger` + `printToPDF` 整条链路（需要装上扩展实跑）
-- PDF 的实际分页表现（标题是否孤立在页尾、大图是否被切断）
-- 推文串 GraphQL 路径的端到端（渲染函数有单元测试，但没在真实长串上跑过）
+- The full `chrome.debugger` + `printToPDF` chain (needs the extension installed and run for real)
+- How the PDF actually paginates (orphaned headings at page ends, large images split across pages)
+- The thread GraphQL path end to end (the render functions have unit tests, but haven't run on a real
+  long thread)
 
-已在真实页面验证过的：正文抽取与边界（136 块 / 11 图）、加粗抽取、图片内联
-（11/11，0 失败）、渲染效果、操作栏按钮挂载。
+Verified on real pages: body extraction and boundaries (136 blocks / 11 images), bold extraction, image
+inlining (11/11, 0 failures), rendering, and mounting the action-bar button.
 
-## 隐私
+## Privacy
 
-**不收集任何数据。** 没有账号、没有服务器、没有统计、没有远程代码。所有导出和归档都在
-你自己的浏览器本地完成。`debugger` / `downloads` / `storage` 这几个权限分别用来做什么，
-详见 [PRIVACY.md](PRIVACY.md)。
+**No data is collected.** No account, no server, no analytics, no remote code. Every export and archive
+happens locally in your own browser. What the `debugger` / `downloads` / `storage` permissions are each
+used for is explained in [PRIVACY.md](PRIVACY.md).
 
-## 文件
+## Files
 
-| 文件 | 用途 |
+| File | Purpose |
 |---|---|
-| `extract.js` | 抽取、渲染、按钮挂载；定义 `window.__XAE_RUN(mode)`（MAIN world） |
-| `compose.js` | Markdown → Draft.js 粘贴注入，长文编辑页的图标（MAIN world） |
-| `md2html.js` | Markdown → Draft 认得的 HTML，compose.js 用 |
-| `net-hook.js` | GraphQL 网络拦截（MAIN world，`document_start`） |
-| `bridge.js` | 隔离世界中继，MAIN ↔ 后台（MAIN 没有 `chrome.*`） |
+| `extract.js` | Extraction, rendering, button mounting; defines `window.__XAE_RUN(mode)` (MAIN world) |
+| `compose.js` | Markdown → Draft.js paste injection, the icon on the Article editor (MAIN world) |
+| `md2html.js` | Markdown → HTML that Draft understands, used by compose.js |
+| `net-hook.js` | GraphQL network interception (MAIN world, `document_start`) |
+| `bridge.js` | Isolated-world relay, MAIN ↔ background (MAIN has no `chrome.*`) |
 | `background.js` | `chrome.debugger` + `printToPDF` |
-| `viewer.html` / `viewer.js` | 扩展页面，独立进程里渲染文档并触发下载 |
-| `extract.min.js` / `bookmarklet.txt` | 书签小工具 |
-| `x-article-exporter.user.js` | 油猴脚本 |
-| `test-renderRich.js` | 富文本渲染单元测试，`node test-renderRich.js` |
+| `viewer.html` / `viewer.js` | Extension page that renders the document in a separate process and triggers the download |
+| `extract.min.js` / `bookmarklet.txt` | Bookmarklet |
+| `x-article-exporter.user.js` | Userscript |
+| `test-renderRich.js` | Rich-text rendering unit tests, `node test-renderRich.js` |
 
-## 相关项目
+## Related projects
 
-「合成 paste 借编辑器自己的上传流水线」这套思路后来拆成了两个独立的零权限扩展：
+The "synthesize a paste and ride the editor's own upload pipeline" idea was later split out into two
+standalone, zero-permission extensions:
 
-- [csdn-md-importer](https://github.com/wangsen2020/csdn-md-importer) —— Markdown 一键灌进 CSDN 编辑器，图片自动上传
-- [zhihu-md-importer](https://github.com/wangsen2020/zhihu-md-importer) —— Markdown 一键灌进知乎专栏，图片自动上传
+- [csdn-md-importer](https://github.com/wangsen2020/csdn-md-importer) — one-click Markdown into the CSDN editor, images uploaded automatically
+- [zhihu-md-importer](https://github.com/wangsen2020/zhihu-md-importer) — one-click Markdown into Zhihu columns, images uploaded automatically
 
-本仓库专注做好 X 一件事：Article 长文 / 推文串导出，以及 Markdown 导入 X 长文编辑器。
+This repository focuses on doing one thing well for X: exporting Articles and threads, and importing
+Markdown into X's Article editor.
 
 ## License
 
