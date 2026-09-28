@@ -1,6 +1,6 @@
 # 隐私政策 / Privacy Policy
 
-**最后更新：2026-09-19**
+**最后更新：2026-09-28**
 
 扩展名称：X Article → PDF
 
@@ -51,6 +51,12 @@
 Markdown 导入功能同理：你粘进正文框的 Markdown 只在你的浏览器里转换成 X 编辑器认得的格式，
 不离开你的设备。
 
+Grok Markdown 功能（右键菜单里的「Grok Markdown」，只在你点了它时才会运行）是唯一会把内容
+交给别人的功能，而交的对象是 X 自己：扩展在后台打开 `x.com/i/grok`，用你自己已登录的 X
+账号，把当前推文串的正文作为一条提问发给 Grok，再把 Grok 写好的 Markdown 存进你的下载文件夹。
+这和你自己手动把内容粘给 Grok 是一回事，这段对话会出现在你自己的 Grok 历史里，受 X 的隐私政策
+约束。开发者和其他任何第三方都拿不到这些内容。
+
 ### 数据的出售或转让
 
 不存在。没有数据被收集，因此也没有数据可被出售、转让或用于与功能无关的用途。
@@ -76,7 +82,7 @@ License: MIT
 
 # Privacy Policy (English)
 
-**Last updated: 2026-09-19**
+**Last updated: 2026-09-28**
 
 This extension **does not collect, store, or transmit any user data to the developer or any
 third party.** Everything happens locally in your own browser.
@@ -100,6 +106,13 @@ It has no accounts, no backend server, no analytics, no telemetry, and loads no 
 - **`host_permissions`** (`x.com`, `twitter.com`, `pbs.twimg.com`) — the content scripts run only
   on these domains, to read the post you're viewing and fetch its images for inlining. The
   extension does not run on any other site.
+
+**Grok Markdown** (the "Grok Markdown" item in the right-click menu, run only when you click it)
+is the one feature that hands content to anyone else, and that is X itself: the extension opens
+`x.com/i/grok` in a background tab, in your own logged-in X account, sends the current thread's
+text to Grok as a prompt, and saves the Markdown Grok writes into your Downloads folder. It is the
+same as pasting the thread into Grok yourself; the conversation appears in your own Grok history
+and is governed by X's privacy policy. The developer and other third parties never see it.
 
 No data is sold or transferred to third parties, because none is collected. This extension is
 not affiliated with, authorized, or endorsed by X Corp.

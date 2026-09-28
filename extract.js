@@ -75,7 +75,12 @@
       fmtPdf: 'PDF',
       fmtMd: 'Markdown',
       fmtHtml: 'HTML (self-contained)',
+      fmtGrok: 'Grok Markdown (AI rewrite)',
       openArchive: 'Archive…',
+      grokWorking: 'Sent to Grok — rewriting as a Markdown article (Expert mode can take a few minutes)…',
+      grokDone: 'Grok Markdown saved — check your downloads',
+      grokFailed: (e) => `Grok failed (${e}) — the plain Markdown option still works`,
+      grokBusy: 'A Grok rewrite is already running…',
       mdDone: (blocks) => `Markdown downloaded — ${blocks} blocks`,
       busy: 'Export already in progress…',
       notPost: 'Open a specific post or article first',
@@ -103,7 +108,12 @@
       fmtPdf: 'PDF',
       fmtMd: 'Markdown',
       fmtHtml: 'HTML（自包含）',
+      fmtGrok: 'Grok Markdown（AI 整理）',
       openArchive: '存档库…',
+      grokWorking: '已交给 Grok 整理成 Markdown 文章（专家模式可能要几分钟）…',
+      grokDone: 'Grok Markdown 已保存，见浏览器下载列表',
+      grokFailed: (e) => `Grok 整理失败（${e}），普通 Markdown 导出仍可用`,
+      grokBusy: 'Grok 正在整理上一篇，请稍候…',
       mdDone: (blocks) => `已下载 Markdown：${blocks} 个块`,
       busy: '正在导出中，请稍候…',
       notPost: '请在具体的推文页或长文页运行',
@@ -454,6 +464,26 @@
       }
     }
     return tweets.filter((tw) => tw && keep.has(tw.rest_id));
+  }
+
+  // 焦点推文之后有没有博主自己的续文。挂载按钮时每次 DOM 变动都会问一遍，
+  // 所以按「焦点 + 缓冲区最新一条」缓存，数据没变就不重算。
+  let selfThreadMemo = { key: '', val: false };
+  function hasSelfThread(focalId) {
+    const buf = window.__XAE_GQL || [];
+    const key = focalId + ':' + buf.length + ':' + (buf.length ? buf[buf.length - 1].t : 0);
+    if (selfThreadMemo.key === key) return selfThreadMemo.val;
+    let val = false;
+    try {
+      const all = collectFromGQL();
+      const focal = all && all.find((tw) => tw && tw.rest_id === focalId);
+      if (focal) {
+        const scoped = scopeToThread(all, focalId, userOf(focal).handle);
+        val = !!(scoped && scoped.length >= 2);
+      }
+    } catch (e) {}
+    selfThreadMemo = { key, val };
+    return val;
   }
 
   function extractThreadGQL(ctx) {
@@ -928,6 +958,62 @@ pre code{background:none;padding:0}
     toast(t('htmlDone', data.blocks.length, res.total - res.failed, res.total), 6000);
   }
 
+  // ---------- Grok Markdown ----------
+  // 原文先按现成的规则转成 Markdown 交给 Grok：加粗、链接、图片位置都已经在里面，
+  // 它只负责重新组织结构，不用再从零猜格式。
+  function buildGrokPrompt(md, ctx) {
+    const handle = (ctx && ctx.handle) || '';
+    const url = (ctx && ctx.url) || location.href;
+    return [
+      "You are an editor. Below is an X (Twitter) thread: the author's original post followed by",
+      "the author's own continuation replies, in order. Rewrite it into one well-structured,",
+      'pleasant-to-read Markdown article.',
+      '',
+      'Rules:',
+      '- Write in the same language as the thread.',
+      '- Start with a single "# " title that states the core point, not a generic topic.',
+      '- Right under the title, one blockquote line (> ) with the key takeaway.',
+      '- Organize the body with "## " section headings. Use bullet or numbered lists for steps,',
+      '  lists and comparisons, **bold** for key terms, fenced code blocks for code or commands,',
+      '  and a table only when comparing several items.',
+      '- Keep every fact, number, name, example and link from the thread. Do not add anything',
+      '  that is not in the thread and do not add your own opinions.',
+      '- Merge the fragmented posts into flowing prose and drop thread artifacts such as',
+      '  "1/", "🧵", "(cont.)" or "continued below".',
+      '- Keep each image where it belongs, as a Markdown image: ![](url)',
+      '- End with a line "---" followed by: Source: [@' + handle + '](' + url + ')',
+      '- Output only the Markdown article: no preamble, no explanation, and do not wrap the',
+      '  whole answer in a code block.',
+      '',
+      '===== THREAD START =====',
+      md,
+      '===== THREAD END =====',
+      'Write the Markdown article now.',
+    ].join(String.fromCharCode(10));
+  }
+
+  let grokRunning = false;
+  let grokBeat = 0;
+  // 后台每 3 秒就会报一次进度；连续两分钟一声不吭，多半是 service worker 被回收了，
+  // 别让提示一直挂着转圈。
+  setInterval(() => {
+    if (!grokRunning || Date.now() - grokBeat < 120000) return;
+    grokRunning = false;
+    toast(t('grokFailed', 'no response'), 10000);
+  }, 10000);
+  function startGrok(data, ctx) {
+    if (grokRunning) { toast(t('grokBusy'), 3000); return; }
+    grokRunning = true;
+    grokBeat = Date.now();
+    toast(t('grokWorking'), 600000);
+    window.postMessage({
+      __xae: 'grokReq',
+      prompt: buildGrokPrompt(blocksToMarkdown(data), ctx),
+      title: safeName(data.title),
+      lang: LANG,
+    }, '*');
+  }
+
   // ---------- 主入口 ----------
   let running = false;
   window.__XAE_RUN = async function (mode, rawCtx) {
@@ -961,6 +1047,7 @@ pre code{background:none;padding:0}
       if (data.kind === 'thread-dom' && ctx.onStatusPage) {
         toast(t('domFallback'), 7000);
       }
+      if (mode === 'grok') { startGrok(data, ctx); return; }
       if (article) {
         const slots = articleRoot(ctx).querySelectorAll('[data-testid="tweetPhoto"]').length;
         const got = [...articleRoot(ctx).querySelectorAll('img')].filter((i) => i.naturalWidth > 0).length;
@@ -1031,6 +1118,17 @@ pre code{background:none;padding:0}
     if (e.source !== window || !e.data) return;
     // 桥接层收到请求后的即时握手：只表示「扩展后台在」，取消 2.5s 的兜底
     if (e.data.__xae === 'alive') { bridgeAlive = true; lastBeat = Date.now(); return; }
+    if (e.data.__xae === 'grokProgress') {
+      grokBeat = Date.now();
+      if (grokRunning && e.data.text) toast(e.data.text, 600000);
+      return;
+    }
+    if (e.data.__xae === 'grokResult') {
+      if (!grokRunning) return;
+      grokRunning = false;
+      toast(e.data.ok ? t('grokDone') : t('grokFailed', e.data.error || 'unknown'), e.data.ok ? 6000 : 10000);
+      return;
+    }
     // viewer 每走完一步就报一句，提示随之更新。用户看得见「卡在内联图片 3/12」
     // 和「一动不动」的区别——后者才是真出事了。
     if (e.data.__xae === 'progress') {
@@ -1106,9 +1204,10 @@ pre code{background:none;padding:0}
     closeFormatMenu();
     const menu = document.createElement('div');
     menu.className = '__xae-menu';
-    // 右对齐，跟 tooltip 一样贴在按钮上方，避免溢出正文列被裁掉。
+    // 挂在 body 上、fixed 定位。挂在操作栏里时它困在帖子的层叠上下文里，
+    // z-index 再大也会被 X 的吸顶标题栏裁掉、被「关注」按钮压住。
     menu.style.cssText =
-      'position:absolute;bottom:calc(100% + 6px);right:0;left:auto;z-index:2147483647;' +
+      'position:fixed;left:0;top:0;visibility:hidden;z-index:2147483647;' +
       'background:var(--xae-menu-bg,#fff);color:var(--xae-menu-fg,#0f1419);' +
       'border:1px solid rgba(120,120,120,.3);border-radius:10px;overflow:hidden;' +
       'box-shadow:0 8px 28px rgba(0,0,0,.22);min-width:150px;padding:4px;' +
@@ -1122,6 +1221,7 @@ pre code{background:none;padding:0}
       ['pdf', t('fmtPdf')],
       ['md', t('fmtMd')],
       ['html', t('fmtHtml')],
+      ['grok', t('fmtGrok')],
       ['-', ''],
       ['__archive', t('openArchive')],
     ];
@@ -1145,7 +1245,17 @@ pre code{background:none;padding:0}
       });
       menu.appendChild(row);
     });
-    host.appendChild(menu);
+    document.body.appendChild(menu);
+    // 右对齐按钮；上方放得下（让开约 60px 的吸顶标题栏）就放上方，否则放下方
+    const r = host.getBoundingClientRect();
+    const mh = menu.offsetHeight, mw = menu.offsetWidth;
+    const top = r.top - mh - 6 >= 60 ? r.top - mh - 6 : Math.min(r.bottom + 6, window.innerHeight - mh - 6);
+    const left = Math.max(6, Math.min(r.right - mw, window.innerWidth - mw - 6));
+    menu.style.top = Math.round(top) + 'px';
+    menu.style.left = Math.round(left) + 'px';
+    menu.style.visibility = 'visible';
+    // fixed 的菜单不会跟着帖子滚，滚动就收起
+    window.addEventListener('scroll', closeFormatMenu, { once: true, capture: true, passive: true });
     // 点击别处 / Esc 关闭；用捕获阶段，且延后一拍以免立刻被这次右键的后续事件关掉
     setTimeout(() => {
       document.addEventListener('click', closeFormatMenu, { once: true, capture: true });
@@ -1181,7 +1291,7 @@ pre code{background:none;padding:0}
     wrap.addEventListener('mouseleave', () => { wrap.style.opacity = '1'; });
     wrap.addEventListener('click', (e) => {
       e.preventDefault(); e.stopPropagation();
-      if (wrap.querySelector('.__xae-menu')) { closeFormatMenu(); return; }
+      if (document.querySelector('.__xae-menu')) { closeFormatMenu(); return; }
       window.__XAE_RUN('pdf', ctxNow());
     });
     // 右键 / 长按：弹出格式菜单（PDF / Markdown / HTML）
@@ -1208,7 +1318,11 @@ pre code{background:none;padding:0}
       // 只有 X 长文（Article）给导出图标。普通推文按钮太吵，也不是这个扩展要做的事。
       // 反向清理同样必要：时间线是虚拟列表，承载过长文的那个 article 节点
       // 随时会被回收去渲染另一条普通推文，按钮不摘就留在了错的帖子上。
-      if (!isArticlePost(a) || (focal && (ctxFromArticle(a) || {}).id !== focal)) {
+      const isFocal = !!focal && (ctxFromArticle(a) || {}).id === focal;
+      // 普通推文例外：详情页上的主帖，且博主在评论区接着写了续文——这种自串
+      // 本身就是一篇文章，只是被拆成了很多条。
+      const eligible = isArticlePost(a) ? (!focal || isFocal) : (isFocal && hasSelfThread(focal));
+      if (!eligible) {
         const stale = a.querySelector('.__xae-btn');
         if (stale) stale.remove();
         return;

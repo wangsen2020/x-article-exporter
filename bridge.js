@@ -10,8 +10,36 @@ const alive = () => {
 
 const reply = (payload) => window.postMessage(Object.assign({ __xae: 'result' }, payload), '*');
 
+// Grok 页上 grok.js 最新报来的状态。后台轮询时原样交回去。
+let grokStatus = null;
+const grokFail = (error) => window.postMessage({ __xae: 'grokResult', ok: false, error }, '*');
+
 window.addEventListener('message', (e) => {
   if (e.source !== window || !e.data) return;
+
+  if (e.data.__xae === 'grokStatus') {
+    const prev = grokStatus;
+    grokStatus = e.data.status || null;
+    // 状态变了就敲一下后台：service worker 被回收过的话，这条消息会把它拉起来接着轮询
+    const sig = (s) => s ? s.state + ':' + (s.note || '') : '';
+    if (sig(prev) !== sig(grokStatus) && alive()) {
+      try { chrome.runtime.sendMessage({ cmd: 'grokWake' }, () => void chrome.runtime.lastError); } catch (err) {}
+    }
+    return;
+  }
+
+  if (e.data.__xae === 'grokReq') {
+    if (!alive()) { grokFail('扩展已更新，请刷新本页后重试 (extension reloaded — refresh this tab)'); return; }
+    try {
+      chrome.runtime.sendMessage(
+        { cmd: 'grok', prompt: e.data.prompt, title: e.data.title, lang: e.data.lang },
+        () => { if (chrome.runtime.lastError) { /* 结果走 grokPush 推送，这里不用管 */ } }
+      );
+    } catch (err) {
+      grokFail((err && err.message) || String(err));
+    }
+    return;
+  }
 
   if (e.data.__xae === 'openOptions') {
     if (alive()) { try { chrome.runtime.sendMessage({ cmd: 'openOptions' }); } catch (err) {} }
@@ -59,8 +87,31 @@ window.addEventListener('message', (e) => {
 
 // 后台主动推过来的消息：工具栏点击、导出进度、以及回调丢失时的最终回执
 try {
-  chrome.runtime.onMessage.addListener((msg) => {
+  chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!msg) return;
+    // ---- Grok 页（后台开的那个标签）----
+    if (msg.cmd === 'grokPing') {
+      sendResponse({ path: location.pathname, main: document.documentElement.getAttribute('data-xae-grok') === '1' });
+      return;
+    }
+    if (msg.cmd === 'grokDrive') {
+      grokStatus = { state: 'queued' };
+      window.postMessage({ __xae: 'grokDrive', prompt: msg.prompt }, '*');
+      sendResponse({ ok: true });
+      return;
+    }
+    if (msg.cmd === 'grokPoll') {
+      // 顺手让 grok.js 检查一轮；它的回报留给下一次轮询取
+      window.postMessage({ __xae: 'grokTick' }, '*');
+      sendResponse(grokStatus || { state: 'unknown' });
+      return;
+    }
+    // ---- 发起页 ----
+    if (msg.cmd === 'grokPush') {
+      if (msg.progress !== undefined) window.postMessage({ __xae: 'grokProgress', text: msg.progress }, '*');
+      else window.postMessage({ __xae: 'grokResult', ok: !!msg.ok, error: msg.error }, '*');
+      return;
+    }
     if (msg.cmd === 'runExport') {
       window.postMessage({ __xae: 'run', mode: msg.mode || 'pdf' }, '*');
       return;

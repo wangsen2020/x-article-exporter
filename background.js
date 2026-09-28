@@ -65,8 +65,164 @@ async function printToPdf(tabId) {
   }
 }
 
+// ---------- Grok Markdown ----------
+// 在后台开一个 x.com/i/grok 标签，由那边的 grok.js 驱动 Grok 自己的输入框。
+// 等待放在这里而不是 Grok 页里：那个标签在后台，页面定时器会被节流；
+// 而这里每 3 秒一次 tabs.sendMessage 本身就会给 service worker 续命。
+const GROK_LIMIT = 12 * 60 * 1000;   // 专家模式整理长串实测要好几分钟
+let grokBusy = false;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function grokNote(st, secs, zh) {
+  const t = secs >= 60
+    ? Math.floor(secs / 60) + (zh ? ' 分 ' : 'm ') + (secs % 60) + (zh ? ' 秒' : 's')
+    : secs + (zh ? ' 秒' : 's');
+  switch (st.note) {
+    case 'input': return zh ? 'Grok：等待输入框…' : 'Grok: waiting for the input box…';
+    case 'mode': return zh ? 'Grok：选择模式（有专家模式就用专家）…' : 'Grok: picking a mode (Expert when available)…';
+    case 'send': return zh ? 'Grok：正在提交…' : 'Grok: submitting…';
+    case 'retry': return zh ? 'Grok 报错，已自动重试一次…' : 'Grok hiccupped — retrying once…';
+    case 'writing':
+      return zh ? 'Grok 正在写（已 ' + (st.len || 0) + ' 字，' + t + '）…'
+                : 'Grok is writing (' + (st.len || 0) + ' chars, ' + t + ')…';
+    default:
+      return zh ? 'Grok 正在思考（' + t + '）…' : 'Grok is thinking (' + t + ')…';
+  }
+}
+
+function downloadText(filename, text, mime) {
+  return new Promise((resolve, reject) => {
+    const url = 'data:' + mime + ';charset=utf-8,' + encodeURIComponent(text);
+    chrome.downloads.download({ url, filename, saveAs: false, conflictAction: 'uniquify' }, (id) => {
+      const err = chrome.runtime.lastError;
+      if (err || id === undefined) reject(new Error((err && err.message) || 'download failed'));
+      else resolve(id);
+    });
+  });
+}
+
+// MV3 的 service worker 随时可能被回收（实测在 Grok 还在写的时候就被换掉了），
+// 内存里的轮询循环一死，Grok 写完了也没人去取。所以任务状态落到
+// storage.session：worker 重启后（被 Grok 页的 grokWake 唤醒，或启动时自检）
+// 从这里接着轮询。
+const GROK_KEY = 'grokJob';
+let grokLoop = false;   // 本 worker 实例里是否已有轮询在跑
+
+const saveGrokJob = (job) => chrome.storage.session.set({ [GROK_KEY]: job });
+const loadGrokJob = async () => (await chrome.storage.session.get(GROK_KEY))[GROK_KEY] || null;
+
+function grokPush(job, o) {
+  if (job && job.src) chrome.tabs.sendMessage(job.src, Object.assign({ cmd: 'grokPush' }, o)).catch(() => {});
+}
+
+async function endGrok(job, result) {
+  grokPush(job, result);
+  await chrome.storage.session.remove(GROK_KEY);
+  if (job && job.tabId) chrome.tabs.remove(job.tabId).catch(() => {});
+  grokBusy = false;
+}
+
+async function runGrok(srcTabId, req) {
+  const zh = req.lang === 'zh';
+  const job = { src: srcTabId, title: req.title, zh, tabId: null, stage: 'open', t0: Date.now() };
+  try {
+    grokPush(job, { progress: zh ? 'Grok：正在后台打开…' : 'Grok: opening in the background…' });
+    const tab = await chrome.tabs.create({ url: 'https://x.com/i/grok', active: false });
+    job.tabId = tab.id;
+    await saveGrokJob(job);
+
+    // 等 Grok 页上的内容脚本就位（bridge.js 回话，且 grok.js 已挂上）
+    let ready = false;
+    for (let i = 0; i < 60 && !ready; i++) {
+      await sleep(1000);
+      try {
+        const r = await chrome.tabs.sendMessage(job.tabId, { cmd: 'grokPing' });
+        ready = !!(r && r.main && (r.path || '').indexOf('/i/grok') === 0);
+      } catch (e) { /* 页面还没加载出来 */ }
+    }
+    if (!ready) throw new Error(zh ? 'Grok 页面没有加载出来' : 'the Grok page did not load');
+
+    await chrome.tabs.sendMessage(job.tabId, { cmd: 'grokDrive', prompt: req.prompt });
+    job.stage = 'drive';
+    job.t0 = Date.now();
+    await saveGrokJob(job);
+    await pollGrok(job);
+  } catch (e) {
+    await endGrok(job, { ok: false, error: (e && e.message) || String(e) });
+  }
+}
+
+async function pollGrok(job) {
+  if (grokLoop) return;
+  grokLoop = true;
+  grokBusy = true;
+  const zh = job.zh;
+  let last = '';
+  try {
+    while (Date.now() - job.t0 < GROK_LIMIT) {
+      let st = null;
+      try { st = await chrome.tabs.sendMessage(job.tabId, { cmd: 'grokPoll' }); } catch (e) {
+        // 标签没了（用户关掉了）就别再等
+        if (!(await chrome.tabs.get(job.tabId).catch(() => null))) {
+          throw new Error(zh ? 'Grok 标签页被关掉了' : 'the Grok tab was closed');
+        }
+      }
+      if (st && st.state === 'error') throw new Error(st.err || 'Grok error');
+      if (st && st.state === 'done' && st.md) {
+        await downloadText((job.title || 'grok') + ' (Grok).md', st.md, 'text/markdown');
+        await endGrok(job, { ok: true, via: st.via });
+        return;
+      }
+      if (st) {
+        const note = grokNote(st, Math.round((Date.now() - job.t0) / 1000), zh);
+        if (note !== last) { last = note; grokPush(job, { progress: note }); }
+      }
+      await sleep(3000);
+    }
+    throw new Error(zh ? '等了 12 分钟 Grok 还没写完' : 'Grok did not finish within 12 minutes');
+  } catch (e) {
+    await endGrok(job, { ok: false, error: (e && e.message) || String(e) });
+  } finally {
+    grokLoop = false;
+  }
+}
+
+// worker 重启后接着干：只接「已经提交给 Grok」的任务，打开阶段断掉的直接判失败。
+async function resumeGrok() {
+  if (grokLoop) return;
+  const job = await loadGrokJob();
+  if (!job) return;
+  if (job.stage !== 'drive' || Date.now() - job.t0 > GROK_LIMIT) {
+    await endGrok(job, { ok: false, error: job.zh ? '后台被浏览器中断了，请重试' : 'the background worker was interrupted, please retry' });
+    return;
+  }
+  pollGrok(job);
+}
+resumeGrok();
+
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (!msg) return;
+
+  // Grok 页的状态一变就来敲门：worker 若是刚被重启，借这个机会把轮询接上
+  if (msg.cmd === 'grokWake') {
+    resumeGrok();
+    return false;
+  }
+
+  if (msg.cmd === 'grok') {
+    const src = (sender.tab && sender.tab.id) || null;
+    if (grokBusy) {
+      if (src) chrome.tabs.sendMessage(src, {
+        cmd: 'grokPush', ok: false,
+        error: msg.lang === 'zh' ? '上一篇还在整理中' : 'another Grok rewrite is still running',
+      }).catch(() => {});
+    } else {
+      grokBusy = true;
+      runGrok(src, msg);
+    }
+    sendResponse({ ok: true });
+    return false;
+  }
 
   // 内容脚本发起一次导出
   if (msg.cmd === 'export') {

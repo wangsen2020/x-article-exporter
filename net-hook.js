@@ -36,6 +36,27 @@
     buf.push({ url: String(url), json, t: Date.now() });
   };
 
+  // Grok 的回答流。伪造 add_response 请求走不通（缺 X 前端现算的 x-client-transaction-id），
+  // 所以由 grok.js 驱动 Grok 自己的输入框发请求，这里只截响应。
+  // 这是拿到 Markdown **源码**的唯一途径：页面上渲染出来的只有排好版的文字。
+  // 流是 ndjson，答案 = messageTag 为 final 的 message 按序拼接；
+  // 不能无差别全拼，否则会把「Thinking about your request」这类状态文字也拼进去。
+  const GROK_RE = /\/2\/grok\/add_response\.json/;
+  const emitGrok = (text) => {
+    const finals = [], others = [];
+    for (const line of String(text).split(String.fromCharCode(10))) {
+      if (!line.trim()) continue;
+      try {
+        const r = JSON.parse(line).result;
+        if (!r || typeof r.message !== 'string') continue;
+        if (r.messageTag === 'final') finals.push(r.message);
+        else if (!r.isThinking && r.messageTag !== 'header') others.push(r.message);
+      } catch (e) {}
+    }
+    const msg = finals.length ? finals.join('') : others.join('');
+    window.postMessage({ __xae: 'grokStream', text: msg, raw: msg ? '' : String(text).slice(0, 400), t: Date.now() }, '*');
+  };
+
   // fetch
   const origFetch = window.fetch;
   if (typeof origFetch === 'function') {
@@ -43,9 +64,14 @@
       let url = '';
       try {
         const a = args[0];
-        url = typeof a === 'string' ? a : a && a.url ? a.url : '';
+        url = typeof a === 'string' ? a : a && a.url ? a.url : a && a.href ? a.href : '';
       } catch (e) {}
       const p = origFetch.apply(this, args);
+      if (GROK_RE.test(url)) {
+        p.then((resp) => {
+          try { resp.clone().text().then(emitGrok).catch(() => {}); } catch (e) {}
+        }).catch(() => {});
+      }
       if (RE.test(url)) {
         p.then((resp) => {
           try {
