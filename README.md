@@ -1,4 +1,22 @@
-![X Article → PDF](docs/hero.svg)
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">
+    <img src="docs/readme_hero.jpg" alt="X Article → PDF — 从 Chrome 网上应用店免费安装 / Install free from the Chrome Web Store">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn"><img src="https://img.shields.io/badge/Chrome%20Web%20Store-Add%20to%20Chrome-2563eb?style=for-the-badge&amp;logo=googlechrome&amp;logoColor=white" alt="Add to Chrome — Chrome Web Store"></a>
+</p>
+
+<p align="center">
+  <b><a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">从 Chrome 网上应用店一键安装</a></b>
+  &nbsp;·&nbsp;
+  <b><a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">Install from the Chrome Web Store</a></b>
+  <br>
+  免费 · 不用克隆、不用打包、不用开开发者模式 · 自动更新 · Edge 也能装
+  <br>
+  Free · no clone, no build, no developer mode · auto-updates · works in Edge too
+</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Manifest-V3-38bdf8?style=flat-square&amp;logo=googlechrome&amp;logoColor=white" alt="Manifest V3">
@@ -21,7 +39,7 @@
 
 ### Chrome 扩展（推荐）
 
-1. `chrome://extensions` → 打开「开发者模式」→「加载已解压的扩展程序」→ 选中本文件夹
+1. 从 **[Chrome 网上应用店](https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn)** 安装（Edge 也可以直接从这里装）
 2. 打开任意 X 长文 / 推文串页面
 3. 点帖子操作栏里的 **PDF** 按钮（在书签、分享图标旁边）——**只有 X 长文（Article）才有这个图标**
 
@@ -40,6 +58,12 @@
 
 > **推文串**场景：装完扩展后**刷新一次页面**再导出。网络拦截器只能捕获它装好之后
 > 发出的请求，当前页面的 `TweetDetail` 早就发完了。捕获不到会自动降级抓 DOM 并提示。
+
+### 从源码加载（开发者）
+
+只有想改代码、或者要跑商店里还没发布的版本时才需要：
+`chrome://extensions` → 打开「开发者模式」→「加载已解压的扩展程序」→ 选中本仓库目录。
+普通使用请直接走上面的商店安装，能自动更新。
 
 ### Markdown → 长文编辑器（写的方向）
 
