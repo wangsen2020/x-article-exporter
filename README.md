@@ -49,7 +49,7 @@ You can also export a self-contained HTML file with every image inlined, for off
 ![The PDF export button in the post action bar, next to bookmark and share](docs/shot_pdf_button.png)
 
 - **Left-click** = export PDF (generated silently, lands in your downloads)
-- **Right-click** = export self-contained HTML (images inlined as data URIs, opens offline)
+- **Right-click** = format menu: PDF / Markdown / HTML (self-contained, images inlined, opens offline) / Grok Markdown / Archive
 - Clicking the extension's toolbar icon does the same as a left-click
 
 The button is icon-only, red, with no round background, matching X's native spec (24×24 viewBox,
@@ -63,6 +63,26 @@ built in, picked from `navigator.language`.
 > **Threads:** after installing, **reload the page once** before exporting. The network hook can only
 > capture requests made after it was installed, and the current page's `TweetDetail` has already been
 > sent. If nothing was captured the exporter falls back to scraping the DOM and tells you so.
+
+### Grok Markdown: turn a thread into an article
+
+Plenty of authors publish a long piece as a chain of replies to themselves: tip 1, tip 2, tip 3…
+Open that post, right-click the red PDF icon and pick **Grok Markdown (AI rewrite)**. The extension
+hands the whole self-thread to Grok on x.com (your own logged-in account, in a background tab), and
+Grok rewrites it into one clean Markdown article: a title, a one-line summary, one heading per point,
+links and images kept. The `.md` file lands in your downloads, usually in under a minute.
+
+![Right-click the PDF icon, pick Grok Markdown, and the thread comes back as a clean .md article](docs/shot_grok.png)
+
+- The item only appears on a post's own page, and only when the author continued the post in their own replies
+- Uses Grok's **Expert** mode when your account has it, otherwise whatever mode is available
+- Only the thread's text is sent, and only to X's own Grok; the conversation shows up in your Grok history
+- The plain **Markdown** item in the same menu is the no-AI export
+
+How it works: `grok.js` runs on `x.com/i/grok` and drives Grok's own input box; the answer is read
+from the `add_response.json` stream that `net-hook.js` already intercepts (with a DOM fallback). The
+background worker polls the Grok tab, and the job is kept in `storage.session` so a recycled service
+worker picks the poll back up instead of leaving a finished answer uncollected.
 
 ### Load from source (developers)
 

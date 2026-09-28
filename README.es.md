@@ -49,13 +49,29 @@ También puedes exportar un HTML autónomo con todas las imágenes incluidas, pa
 ![El botón de exportar a PDF en la barra de acciones, junto a guardar y compartir](docs/shot_pdf_button.png)
 
 - **Clic izquierdo** = exportar PDF (se genera en segundo plano y aparece en tus descargas)
-- **Clic derecho** = exportar HTML autónomo (imágenes incluidas como data URI, se abre sin conexión)
+- **Clic derecho** = menú de formatos: PDF / Markdown / HTML (autónomo, imágenes incluidas, se abre sin conexión) / Grok Markdown / Archivo
 - El ícono de la extensión en la barra del navegador hace lo mismo que el clic izquierdo
 
 > **Hilos:** después de instalar, **recarga la página una vez** antes de exportar. El interceptor de
 > red solo captura las solicitudes que se hacen después de instalarse, y la solicitud `TweetDetail` de
 > la página actual ya se envió. Si no se capturó nada, la extensión extrae el contenido del DOM y te
 > lo avisa.
+
+### Grok Markdown: convierte un hilo en un artículo
+
+Muchos autores publican un texto largo como una cadena de respuestas a sí mismos: consejo 1, consejo 2,
+consejo 3… Abre esa publicación, haz clic derecho en el ícono rojo de PDF y elige **Grok Markdown (AI
+rewrite)**. La extensión le pasa el hilo completo a Grok en x.com (con tu propia cuenta, en una pestaña
+en segundo plano) y Grok lo reescribe como un solo artículo Markdown limpio: título, resumen de una
+línea, un encabezado por punto, y enlaces e imágenes conservados. El archivo `.md` llega a tus
+descargas, normalmente en menos de un minuto.
+
+![Clic derecho en el ícono PDF, elige Grok Markdown y el hilo vuelve como un artículo .md limpio](docs/shot_grok.es.png)
+
+- La opción solo aparece en la página de la publicación y solo si el autor la continuó en sus propias respuestas
+- Usa el modo **Experto** de Grok si tu cuenta lo tiene; si no, el modo disponible
+- Solo el texto del hilo va al propio Grok de X; la conversación queda en tu historial de Grok
+- La opción **Markdown** normal del mismo menú es la exportación sin IA
 
 ### Cargar desde el código fuente (desarrolladores)
 

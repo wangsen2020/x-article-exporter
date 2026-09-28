@@ -49,12 +49,28 @@ Você também pode exportar um HTML autônomo com todas as imagens embutidas, pa
 ![O botão de exportar PDF na barra de ações, ao lado de salvar e compartilhar](docs/shot_pdf_button.png)
 
 - **Clique esquerdo** = exportar PDF (gerado em segundo plano, cai direto nos seus downloads)
-- **Clique direito** = exportar HTML autônomo (imagens embutidas como data URI, abre offline)
+- **Clique direito** = menu de formatos: PDF / Markdown / HTML (autônomo, imagens embutidas, abre offline) / Grok Markdown / Arquivo
 - O ícone da extensão na barra do navegador faz o mesmo que o clique esquerdo
 
 > **Threads:** depois de instalar, **recarregue a página uma vez** antes de exportar. O interceptador de
 > rede só captura as requisições feitas depois de instalado, e a requisição `TweetDetail` da página
 > atual já foi enviada. Se nada for capturado, a extensão extrai o conteúdo do DOM e avisa você.
+
+### Grok Markdown: transforme uma thread em um artigo
+
+Muitos autores publicam um texto longo como uma sequência de respostas a si mesmos: dica 1, dica 2,
+dica 3… Abra esse post, clique com o botão direito no ícone vermelho de PDF e escolha **Grok Markdown
+(AI rewrite)**. A extensão entrega a thread inteira ao Grok no x.com (na sua própria conta, em uma aba
+em segundo plano) e o Grok a reescreve como um único artigo Markdown limpo: título, resumo de uma
+linha, um título por item, com links e imagens preservados. O arquivo `.md` cai nos seus downloads,
+normalmente em menos de um minuto.
+
+![Clique direito no ícone PDF, escolha Grok Markdown e a thread volta como um artigo .md limpo](docs/shot_grok.pt-BR.png)
+
+- A opção só aparece na página do post e só quando o autor continuou o post nas próprias respostas
+- Usa o modo **Expert** do Grok quando a sua conta tem acesso; caso contrário, o modo disponível
+- Só o texto da thread vai para o próprio Grok do X; a conversa aparece no seu histórico do Grok
+- A opção **Markdown** comum do mesmo menu é a exportação sem IA
 
 ### Carregar pelo código-fonte (desenvolvedores)
 
