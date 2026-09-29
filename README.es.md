@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">
-    <img src="docs/readme_hero.es.jpg" alt="X Article → PDF — instálalo gratis desde Chrome Web Store">
+    <img src="docs/readme_hero.es.jpg" alt="Extensión de Chrome X Article to PDF: guarda Artículos e hilos de X (Twitter) como PDF buscable">
   </a>
 </p>
 
@@ -26,13 +26,16 @@
   <img src="https://img.shields.io/badge/License-MIT-94a3b8?style=flat-square" alt="Licencia MIT">
 </p>
 
-# X Article → PDF
+# X Article to PDF — Exporta Artículos e hilos de Twitter a PDF y Markdown
 
-Exporta un **Artículo** o un **hilo** de X (Twitter) a un PDF que conserva el formato: texto
-seleccionable y buscable, imágenes en resolución original, directo a tus descargas.
-Sin cuadro de diálogo de impresión y sin abrir pestañas nuevas.
+**X Article to PDF** es una extensión de Chrome gratuita y de código abierto que guarda los
+**Artículos** y los **hilos** de X (Twitter) como PDF de verdad —texto seleccionable y buscable,
+imágenes en resolución original— o como Markdown y HTML autónomo, en un clic y directo a tus descargas.
+Sin cuadro de diálogo de impresión, sin pestañas nuevas y sin crear cuentas.
 
-También puedes exportar un HTML autónomo con todas las imágenes incluidas, para guardarlo offline.
+También convierte un hilo largo que el autor siguió en sus propias respuestas (consejo 1, consejo 2,
+consejo 3…) en un solo artículo Markdown limpio usando el propio Grok de X, y pega Markdown en el editor
+de Artículos de X con el formato intacto.
 
 ## Funciones
 
@@ -43,8 +46,8 @@ También puedes exportar un HTML autónomo con todas las imágenes incluidas, pa
 ### Extensión de Chrome (recomendado)
 
 1. Instálala desde **[Chrome Web Store](https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn)** (Edge también puede instalarla desde ahí)
-2. Abre cualquier Artículo o hilo de X
-3. Haz clic en el botón **PDF** de la barra de acciones de la publicación (junto a guardar y compartir) — **solo aparece en los Artículos de X**
+2. Abre cualquier Artículo de X, o una publicación que el autor continuó como hilo
+3. Haz clic en el ícono rojo de **PDF** de la barra de acciones de la publicación, junto a guardar y compartir
 
 ![El botón de exportar a PDF en la barra de acciones, junto a guardar y compartir](docs/shot_pdf_button.png)
 
@@ -72,12 +75,6 @@ descargas, normalmente en menos de un minuto.
 - Usa el modo **Experto** de Grok si tu cuenta lo tiene; si no, el modo disponible
 - Solo el texto del hilo va al propio Grok de X; la conversación queda en tu historial de Grok
 - La opción **Markdown** normal del mismo menú es la exportación sin IA
-
-### Cargar desde el código fuente (desarrolladores)
-
-Solo hace falta si quieres modificar el código o probar una versión que todavía no está en la tienda:
-`chrome://extensions` → activa el **Modo de desarrollador** → **Cargar descomprimida** → elige la
-carpeta de este repositorio. Para el uso normal, instálala desde la tienda: se actualiza sola.
 
 ### Markdown → editor de Artículos de X
 
@@ -107,11 +104,47 @@ Estas dos formas **no tienen el backend de la extensión**, así que el PDF no e
 2.5 s se descarga en su lugar un HTML autónomo. El bookmarklet además se inyecta demasiado tarde para
 interceptar la red, así que en los hilos solo puede extraer el contenido del DOM.
 
-## Notas técnicas
+## Preguntas frecuentes
 
-Los detalles de implementación (las tres restricciones clave, las dos rutas de extracción, cómo se
-genera el PDF y los problemas conocidos) están en el [README en inglés](README.md). Se mantienen en un
-solo idioma para que no queden versiones desactualizadas.
+### ¿Cómo guardo un Artículo de X (Twitter) como PDF?
+
+Instala la extensión, abre el Artículo en x.com y haz clic en el ícono rojo de PDF de la barra de
+acciones. El PDF se genera en segundo plano y se guarda en tus descargas, sin cuadro de impresión. El
+texto sigue siendo seleccionable y buscable, y las imágenes conservan su resolución original.
+
+### ¿Cómo guardo un hilo de Twitter como PDF?
+
+Abre la primera publicación del hilo (su propia página, `x.com/<usuario>/status/<id>`), recarga la página
+una vez después de instalar la extensión y haz clic en el ícono de PDF. La extensión reconstruye el hilo
+completo con los datos de X, así que no se pierden las publicaciones que ya salieron de la pantalla.
+
+### ¿Cómo convierto un hilo de Twitter a Markdown para Obsidian o Notion?
+
+Haz clic derecho en el ícono de PDF y elige **Markdown** para una exportación directa, o **Grok Markdown**
+para que Grok reescriba el hilo como un artículo con título, resumen y encabezados. Las dos opciones
+guardan un archivo `.md` que puedes llevar a Obsidian, Notion, Logseq o cualquier editor Markdown.
+
+### ¿Es gratis? ¿Recopila mis datos?
+
+Es gratis y de código abierto (MIT). No recopila nada: sin cuenta, sin servidor, sin analíticas, sin
+código remoto. La única función que envía contenido es Grok Markdown, que manda el texto del hilo al
+propio Grok de X con tu propia cuenta. Más detalles en [PRIVACY.md](PRIVACY.md).
+
+### ¿Por qué Chrome muestra "comenzó a depurar este navegador"?
+
+Así la extensión genera un PDF real sin cuadro de impresión: usa la API `debugger` de Chrome para
+renderizar la página a PDF en una pestaña en segundo plano. Chrome siempre muestra ese aviso mientras
+tanto y desaparece al terminar. Si el depurador no se puede conectar, recibes un HTML autónomo.
+
+### ¿Funciona en Microsoft Edge?
+
+Sí. Edge puede instalar extensiones directamente desde Chrome Web Store.
+
+## Para desarrolladores
+
+La arquitectura, las trampas que explican el diseño y cómo cargar la extensión desde el código fuente
+están en [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) (en inglés, para que no queden versiones
+desactualizadas).
 
 ## Privacidad
 

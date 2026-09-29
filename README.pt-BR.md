@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">
-    <img src="docs/readme_hero.pt-BR.jpg" alt="X Article → PDF — instale grátis pela Chrome Web Store">
+    <img src="docs/readme_hero.pt-BR.jpg" alt="Extensão do Chrome X Article to PDF: salve Artigos e threads do X (Twitter) como PDF pesquisável">
   </a>
 </p>
 
@@ -26,13 +26,16 @@
   <img src="https://img.shields.io/badge/License-MIT-94a3b8?style=flat-square" alt="Licença MIT">
 </p>
 
-# X Article → PDF
+# X Article to PDF — Exporte Artigos e threads do Twitter para PDF e Markdown
 
-Exporte um **Artigo** ou uma **thread** do X (Twitter) para um PDF que mantém a formatação: texto
-selecionável e pesquisável, imagens na resolução original, direto para os seus downloads.
-Sem janela de impressão e sem abrir abas novas.
+**X Article to PDF** é uma extensão gratuita e de código aberto para o Chrome que salva **Artigos** e
+**threads** do X (Twitter) como PDF de verdade —texto selecionável e pesquisável, imagens na resolução
+original— ou como Markdown e HTML autônomo, em um clique e direto nos seus downloads. Sem janela de
+impressão, sem abas novas e sem criar conta.
 
-Você também pode exportar um HTML autônomo com todas as imagens embutidas, para guardar offline.
+Ela também transforma uma thread longa que o autor foi continuando nas próprias respostas (dica 1,
+dica 2, dica 3…) em um único artigo Markdown limpo usando o próprio Grok do X, e cola Markdown no editor
+de Artigos do X com a formatação intacta.
 
 ## Recursos
 
@@ -43,8 +46,8 @@ Você também pode exportar um HTML autônomo com todas as imagens embutidas, pa
 ### Extensão do Chrome (recomendado)
 
 1. Instale pela **[Chrome Web Store](https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn)** (o Edge também consegue instalar por lá)
-2. Abra qualquer Artigo ou thread do X
-3. Clique no botão **PDF** na barra de ações do post (ao lado de salvar e compartilhar) — **ele só aparece nos Artigos do X**
+2. Abra qualquer Artigo do X, ou um post que o autor continuou como thread
+3. Clique no ícone vermelho de **PDF** na barra de ações do post, ao lado de salvar e compartilhar
 
 ![O botão de exportar PDF na barra de ações, ao lado de salvar e compartilhar](docs/shot_pdf_button.png)
 
@@ -71,12 +74,6 @@ normalmente em menos de um minuto.
 - Usa o modo **Expert** do Grok quando a sua conta tem acesso; caso contrário, o modo disponível
 - Só o texto da thread vai para o próprio Grok do X; a conversa aparece no seu histórico do Grok
 - A opção **Markdown** comum do mesmo menu é a exportação sem IA
-
-### Carregar pelo código-fonte (desenvolvedores)
-
-Só é necessário se você quiser alterar o código ou rodar uma versão que ainda não está na loja:
-`chrome://extensions` → ative o **Modo do desenvolvedor** → **Carregar sem compactação** → escolha a
-pasta deste repositório. Para uso normal, instale pela loja: ela se atualiza sozinha.
 
 ### Markdown → editor de Artigos do X
 
@@ -106,11 +103,47 @@ Essas duas formas **não têm o backend da extensão**, então o PDF não está 
 um HTML autônomo é baixado no lugar. O bookmarklet também é injetado tarde demais para interceptar a
 rede, então nas threads ele só consegue extrair o conteúdo do DOM.
 
-## Notas técnicas
+## Perguntas frequentes
 
-Os detalhes de implementação (as três restrições principais, os dois caminhos de extração, como o PDF é
-gerado e os problemas conhecidos) estão no [README em inglês](README.md). Eles ficam em um só idioma
-para não haver versões desatualizadas.
+### Como salvar um Artigo do X (Twitter) em PDF?
+
+Instale a extensão, abra o Artigo no x.com e clique no ícone vermelho de PDF na barra de ações. O PDF é
+gerado em segundo plano e salvo nos seus downloads, sem janela de impressão. O texto continua
+selecionável e pesquisável, e as imagens mantêm a resolução original.
+
+### Como salvar uma thread do Twitter em PDF?
+
+Abra o primeiro post da thread (a página dele, `x.com/<usuário>/status/<id>`), recarregue a página uma
+vez depois de instalar a extensão e clique no ícone de PDF. A extensão reconstrói a thread inteira com os
+dados do próprio X, então nenhum post que já saiu da tela se perde.
+
+### Como converter uma thread do Twitter em Markdown para o Obsidian ou o Notion?
+
+Clique com o botão direito no ícone de PDF e escolha **Markdown** para exportar direto, ou **Grok
+Markdown** para o Grok reescrever a thread como um artigo com título, resumo e subtítulos. As duas opções
+salvam um arquivo `.md` que você pode levar para o Obsidian, Notion, Logseq ou qualquer editor Markdown.
+
+### É grátis? Coleta meus dados?
+
+É grátis e de código aberto (MIT). Não coleta nada: sem conta, sem servidor, sem analytics, sem código
+remoto. O único recurso que envia conteúdo é o Grok Markdown, que manda o texto da thread para o próprio
+Grok do X na sua conta. Detalhes em [PRIVACY.md](PRIVACY.md).
+
+### Por que o Chrome mostra "começou a depurar este navegador"?
+
+É assim que a extensão gera um PDF de verdade sem janela de impressão: ela usa a API `debugger` do Chrome
+para renderizar a página em PDF numa aba em segundo plano. O Chrome sempre mostra esse aviso enquanto
+isso acontece, e ele some quando termina. Se o depurador não conseguir se conectar, você recebe um HTML
+autônomo.
+
+### Funciona no Microsoft Edge?
+
+Sim. O Edge instala extensões direto da Chrome Web Store.
+
+## Para desenvolvedores
+
+A arquitetura, as armadilhas que explicam o design e como carregar a extensão pelo código-fonte estão em
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) (em inglês, para não haver versões desatualizadas).
 
 ## Privacidade
 

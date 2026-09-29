@@ -7,7 +7,7 @@
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">
-    <img src="docs/readme_hero.jpg" alt="X Article → PDF — install free from the Chrome Web Store">
+    <img src="docs/readme_hero.jpg" alt="X Article to PDF Chrome extension: save X (Twitter) Articles and threads as searchable PDF">
   </a>
 </p>
 
@@ -26,51 +26,50 @@
   <img src="https://img.shields.io/badge/License-MIT-94a3b8?style=flat-square" alt="MIT License">
 </p>
 
-# X Article → PDF
+# X Article to PDF — Export Twitter Articles & Threads to PDF and Markdown
 
-Export an X (Twitter) **Article** or **thread** to a PDF that keeps its layout —
-selectable, searchable text and full-resolution images, saved straight to your downloads.
-No print dialog, no new tab.
+**X Article to PDF** is a free, open-source Chrome extension that saves X (Twitter) **Articles** and
+**threads** as real PDFs — selectable, searchable text and full-resolution images — or as Markdown and
+self-contained HTML, in one click, straight to your downloads. No print dialog, no new tab, no account.
 
-You can also export a self-contained HTML file with every image inlined, for offline archiving.
+It can also turn a long self-thread (tip 1, tip 2, tip 3… posted as replies) into one clean Markdown
+article using X's own Grok, and paste Markdown into X's Article editor with the formatting intact.
 
 ## Features
 
-![X Article → PDF feature overview](docs/features.en.svg)
+![X Article to PDF feature overview: capture, export, offline archive, Markdown import](docs/features.en.svg)
 
-## Usage
+- **X Article / Twitter thread → PDF**: vector text you can search and copy, images at original resolution
+- **Twitter thread → Markdown**: plain Markdown export, or an AI rewrite into an article with **Grok Markdown**
+- **Self-contained HTML**: every image inlined, opens offline even if the original post is deleted
+- **Local archive**: optional on-device library of everything you exported
+- **Markdown → X Article editor**: paste a Markdown draft and convert it to X's native formatting
+- **Private**: no server, no analytics; everything runs in your browser
 
-### Chrome extension (recommended)
+## How to use
 
 1. Install it from the **[Chrome Web Store](https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn)** (Edge can install it from there too)
-2. Open any X Article or thread
-3. Click the **PDF** button in the post's action bar (next to bookmark and share) — **it only appears on X Articles**
+2. Open any X Article, or a post the author continued as a thread
+3. Click the red **PDF** icon in the post's action bar, next to bookmark and share
 
-![The PDF export button in the post action bar, next to bookmark and share](docs/shot_pdf_button.png)
+![The red PDF export icon in an X post's action bar, next to bookmark and share](docs/shot_pdf_button.png)
 
-- **Left-click** = export PDF (generated silently, lands in your downloads)
-- **Right-click** = format menu: PDF / Markdown / HTML (self-contained, images inlined, opens offline) / Grok Markdown / Archive
+- **Left-click** = export PDF (generated in the background, lands in your downloads)
+- **Right-click** = format menu: PDF / Markdown / HTML (self-contained, opens offline) / Grok Markdown / Archive
 - Clicking the extension's toolbar icon does the same as a left-click
 
-The button is icon-only, red, with no round background, matching X's native spec (24×24 viewBox,
-18.75px, `fill` rather than `stroke`). Alignment gotcha: the action bar is `align-items:stretch` with
-47px-tall siblings, so **giving the button a fixed height top-aligns it** and puts the icon about 7px
-above the native ones; it has to use `align-self:stretch` instead.
-The copy lives in the hover tooltip and `aria-label`, all driven by the `I18N` table at the top of
-`extract.js`. Adding a language means adding one key to `I18N` — no DOM changes. `zh` and `en` are
-built in, picked from `navigator.language`.
+> **Threads:** after installing, **reload the page once** before exporting. The extension reads the
+> thread from X's own network responses, and the current page's responses arrived before it was
+> installed. If nothing was captured it falls back to reading the page and tells you so.
 
-> **Threads:** after installing, **reload the page once** before exporting. The network hook can only
-> capture requests made after it was installed, and the current page's `TweetDetail` has already been
-> sent. If nothing was captured the exporter falls back to scraping the DOM and tells you so.
-
-### Grok Markdown: turn a thread into an article
+### Turn a Twitter thread into a Markdown article with Grok
 
 Plenty of authors publish a long piece as a chain of replies to themselves: tip 1, tip 2, tip 3…
 Open that post, right-click the red PDF icon and pick **Grok Markdown (AI rewrite)**. The extension
 hands the whole self-thread to Grok on x.com (your own logged-in account, in a background tab), and
 Grok rewrites it into one clean Markdown article: a title, a one-line summary, one heading per point,
-links and images kept. The `.md` file lands in your downloads, usually in under a minute.
+links and images kept. The `.md` file lands in your downloads, usually in under a minute — ready for
+Obsidian, Notion or any Markdown editor.
 
 ![Right-click the PDF icon, pick Grok Markdown, and the thread comes back as a clean .md article](docs/shot_grok.png)
 
@@ -79,204 +78,77 @@ links and images kept. The `.md` file lands in your downloads, usually in under 
 - Only the thread's text is sent, and only to X's own Grok; the conversation shows up in your Grok history
 - The plain **Markdown** item in the same menu is the no-AI export
 
-How it works: `grok.js` runs on `x.com/i/grok` and drives Grok's own input box; the answer is read
-from the `add_response.json` stream that `net-hook.js` already intercepts (with a DOM fallback). The
-background worker polls the Grok tab, and the job is kept in `storage.session` so a recycled service
-worker picks the poll back up instead of leaving a finished answer uncollected.
-
-### Load from source (developers)
-
-Only needed if you want to change the code or run a version that isn't in the store yet:
-`chrome://extensions` → turn on **Developer mode** → **Load unpacked** → pick this repository folder.
-For normal use, install from the store above — it updates automatically.
-
-### Markdown → Article editor (the writing direction)
+### Paste Markdown into the X Article editor
 
 Open `x.com/compose/articles/edit/<id>` and you'll see an extra icon **to the left of Preview**. Paste
 your Markdown into the body as-is and click the icon: the body turns into X's own Article formatting
-in place (headings / lists / quotes / code blocks / bold and italic / links). There's no confirmation
-dialog — if it goes wrong, press **Ctrl+Z**; it uses Draft's own edit history.
+in place (headings / lists / quotes / bold and italic / links). There's no confirmation dialog — if it
+goes wrong, press **Ctrl+Z**; it uses the editor's own edit history.
 
-![The Article editor toolbar with the red Markdown import icon to the left of Preview](docs/shot_md_toolbar.png)
+![The X Article editor toolbar with the red Markdown import icon to the left of Preview](docs/shot_md_toolbar.png)
 
-The key is **not touching the DOM**. X's Article editor is Draft.js: the real document is an in-memory
-ContentState and the contenteditable is only a projection — injected innerHTML is ignored, and the next
-setState wipes it anyway. Draft's only public rich-text entry point is `paste`: its `editOnPaste` reads
-`text/html` from `clipboardData` and parses it with its own converter. So the approach is Markdown →
-HTML that Draft understands → a synthetic `ClipboardEvent('paste')`.
-
-Three findings from testing (Draft 0.11.7, see the comments in `compose.js`):
-
-- **Hook the component instance, not the props.** React double-buffers two fiber trees, and the
-  `__reactFiber$` on a DOM node often points at the stale one, so `memoizedProps.editorState` lags a
-  step behind — in practice it read as an empty document while the instance's `_latestEditorState` was
-  current. Read state from that, and write back through the instance's `update()`, the same path Draft
-  uses internally.
-- **Nested lists only work as "child list is a sibling of the parent list"**:
-  `<ul><li>B</li><ul><li>B1</li></ul></ul>` gives `depth:1`; `<li>B<ul>…</ul></li>` collapses into a
-  single `BB1` block (and the latter is what most Markdown libraries emit by default).
-- **DOM selection means nothing to Draft**: neither `Range` nor `execCommand('selectAll')` moves it (the
-  latter even returns true); a paste still lands at the cursor Draft remembers. Replacing the whole
-  body requires stretching its selection with `forceSelection`.
-
-After one conversion the body contains no markup anymore; clicking again would re-flow the whole
-article as plain paragraphs — so if there's no Markdown syntax the icon does nothing, which also guards
-against accidental clicks.
-
-The icon sits left of Preview. **Preview is not a `<button>` and has no `role="button"` — it's an
-`<a role="link">`.** The first version only searched buttons and role=button, got zero hits on the real
-editor, and the icon fell back to floating in the bottom-right. So now it matches on text, not tags:
-find the leaf whose entire text is "Preview", climb to the outermost ancestor whose text is still just
-that, and insert before it.
-
-Whatever an X Article can't hold is downgraded — plain beats lost text: tables → plain paragraphs like
+Whatever an X Article can't hold is downgraded rather than lost: tables → plain paragraphs like
 `A | 1`, horizontal rules → a `— — —` line, images → links (X images must go through its own upload).
-
-**X doesn't support code blocks**: tested on the real editor, ```` ``` ```` fences and inline `` ` `` both
-land as plain paragraphs / plain text (the text survives, only the styling is lost). Its toolbar has no
-code button either. What passed on the real editor: three heading levels, ordered and unordered lists
-(including nested depth), quotes, bold, italic and links.
+X Articles have no code formatting, so code blocks and inline code land as plain text.
 
 ### Userscript / bookmarklet
 
 Drag `x-article-exporter.user.js` into Tampermonkey, or paste the whole of `bookmarklet.txt` into a
-bookmark's URL field.
+bookmark's URL field. Neither has the extension's background page, so they export self-contained HTML
+instead of PDF, and the bookmarklet can only read threads from the page itself.
 
-Neither form has an **extension backend**, so there's no `chrome.debugger`: a PDF request times out
-after 2.5s and falls back to downloading self-contained HTML. The bookmarklet also injects too late to
-install the network hook, so threads can only use the DOM fallback.
+## FAQ
 
-## Three hard constraints (all learned the hard way — read before changing the code)
+### How do I save an X (Twitter) Article as a PDF?
 
-### 1. Pre-scrolling must stop at the bottom of the article, never the bottom of the document
+Install the extension, open the Article on x.com and click the red PDF icon in the post's action bar.
+The PDF is generated in the background and saved to your downloads — no print dialog. The text stays
+selectable and searchable, and images keep their original resolution.
 
-An X Article's body is only non-virtualized **within the article's own scroll range**. As soon as you
-scroll into the replies, the whole body is unloaded from the DOM:
+### How do I save a Twitter thread as a PDF?
 
-| Metric | Scrolled to document bottom | Scrolled to article bottom |
-|---|---|---|
-| Body blocks | **0** (body unloaded, root article element replaced) | **136** |
-| Body images | 0, mixed with images from replies | **11** |
-| Scroll end | 27354 | **17529** |
+Open the first post of the thread (its own page, `x.com/<user>/status/<id>`), reload the page once
+after installing, then click the PDF icon. The extension rebuilds the whole thread from X's own data,
+so posts that the timeline has scrolled out of view are not lost.
 
-So every round, `loadArticle()` recomputes `articleRoot().getBoundingClientRect().bottom + scrollY` as
-the upper bound and keeps half a screen of margin. Before the body renders that height is 0, which
-would make the bound negative — it has to wait for `.longform-unstyled` to appear first.
+### How do I convert a Twitter thread to Markdown for Obsidian or Notion?
 
-### 2. Every selector must be scoped to the body's root article
+Right-click the PDF icon and pick **Markdown** for a direct export, or **Grok Markdown** to have Grok
+rewrite the thread into a structured article with a title, summary and headings. Both save a `.md` file
+you can drop into Obsidian, Notion, Logseq or any Markdown editor.
 
-Selecting across the whole document pulls reply images in as body illustrations; combined with the
-unloading in constraint 1, you get a mixed-up mess.
+### Is it free? Does it collect my data?
 
-### 2b. Cover de-duplication can't use string `includes`
+It's free and open source (MIT). It collects nothing: no account, no server, no analytics, no remote
+code. The only feature that sends content anywhere is Grok Markdown, which sends the thread's text to
+X's own Grok in your own account. Details in [PRIVACY.md](PRIVACY.md).
 
-URLs in `parts` have already been through `esc()` (`&` → `&amp;`), so an `includes` check with the raw,
-unescaped URL **never matches** and the cover gets inserted twice. One real article had a cover URL
-containing `&` and the old logic reproduced the duplicate 100% of the time. De-duplication now uses a
-`Set` of raw URLs collected during extraction.
+### How is this different from Thread Reader App?
 
-### 3. Don't call print() in the page
+Thread Reader App is a web service: you reply to a thread with a bot mention and read the unrolled
+version on its site. This extension works in your own browser, right on x.com: one click saves the
+Article or thread as a PDF, Markdown or HTML file on your computer, and it also handles X Articles.
 
-A newly opened same-origin tab **shares the renderer process** with x.com, so a large document's print
-preview freezes the original page's main thread too (the page locks up, the wheel stops responding).
-So now:
+### Why does Chrome show "started debugging this browser"?
 
-- PDF rendering happens in an **extension page** (`chrome-extension://` origin, separate process)
-- The document handed to it stays lightweight with remote image links (tens of KB); images are only
-  inlined when exporting HTML
+That's how the extension produces a real PDF without a print dialog: it uses Chrome's `debugger` API to
+render the page to PDF in a background tab. Chrome always shows this banner while it runs; it closes
+when the export finishes. If the debugger can't attach, you get a self-contained HTML file instead.
 
-## Two extraction paths
+### Does it work in Microsoft Edge?
 
-### X Article — scrape the DOM
-
-Anchored on `.longform-unstyled` / `.longform-header-one` / `.longform-header-two` /
-`.longform-blockquote` / `.longform-ordered-list-item` / `[data-testid="tweetPhoto"]`, rebuilt as
-`<p> <h2> <h3> <blockquote> <ol> <figure>`.
-
-Bold has to come from computed style: **X doesn't use `<strong>`; bold is a CSS class**. And
-`font-weight` inherits, so it must be compared with the parent, or you extract nested duplicate
-`<strong>` tags.
-
-### Threads — intercept GraphQL
-
-Threads are a virtualized list in the DOM, so scraping the DOM always loses content. `net-hook.js` runs
-at `document_start`, installs fetch / XHR interception before X's own requests go out, caches the
-`TweetDetail` responses, and export rebuilds the thread straight from the structured JSON. This path
-also recovers information the DOM has already lost:
-
-| Field | What you get |
-|---|---|
-| `note_tweet.richtext.richtext_tags` | Exact bold / italic ranges in long posts |
-| `note_tweet.media.inline_media` | Images embedded mid-text and where they go |
-| `entities.urls[].expanded_url` | Real link targets (the DOM only has t.co short links) |
-| `extended_entities.media` | Original media, independent of display size |
-
-**Every index is a code point, not a UTF-16 code unit.**
-With CJK text and emoji, slicing by `string.length` shifts everything — you have to `Array.from()`
-first. `node test-renderRich.js` covers this with 11 unit tests.
-
-## How the PDF is generated
-
-`chrome.debugger` + `Page.printToPDF`. It's the **only** way for an extension to get a real PDF with
-vector text, no print dialog and no visible tab.
-
-The cost: Chrome shows a **"X Article → PDF" started debugging this browser** banner. Chrome forces it
-and it can't be removed. While the banner is up, DevTools can't be used (and vice versa).
-
-Flow: the content script hands lightweight HTML to the background → the background opens an extension
-page in a **background tab** to render it → waits for images to decode → `printToPDF` → the page
-triggers the download with `<a download>` → the tab closes. Your current page is never switched away.
-
-If attaching the debugger fails (DevTools already open, enterprise policy, etc.), **no print dialog
-appears** — it downloads self-contained HTML instead and tells you why. Nothing in the chain interrupts
-what you're doing.
-
-## Other known pitfalls
-
-- **Keep the page in the foreground.** Chrome doesn't load lazy images in background tabs (in testing,
-  23 scroll rounds kept the image count at 0; forcing a repaint jumped it to 14), so the script waits
-  for you to switch back.
-- **Turn `&amp;` back into `&` before fetching images.** Fetching an HTML-escaped URL makes X's image
-  host return an empty response **without an error**, and the inlined result is a pile of blank images.
-- **Injection must be in the MAIN world.** The cached GraphQL data hangs off the page's `window`, which
-  the isolated world can't read; image fetches also need the page's own x.com origin for CORS.
-  The MAIN world has no `chrome.*` API, so `bridge.js` (isolated world) relays via postMessage.
-- X can change at any time. On the Article path, what breaks is the handful of classes in `ART_SEL`;
-  on the thread path, the GraphQL field structure (`collectFromGQL` / `userOf` already handle both the
-  old and new schema).
-
-## Not yet verified
-
-The following only has code and reasoning behind it and **has not been run end to end**:
-
-- The full `chrome.debugger` + `printToPDF` chain (needs the extension installed and run for real)
-- How the PDF actually paginates (orphaned headings at page ends, large images split across pages)
-- The thread GraphQL path end to end (the render functions have unit tests, but haven't run on a real
-  long thread)
-
-Verified on real pages: body extraction and boundaries (136 blocks / 11 images), bold extraction, image
-inlining (11/11, 0 failures), rendering, and mounting the action-bar button.
+Yes. Edge can install extensions from the Chrome Web Store directly.
 
 ## Privacy
 
 **No data is collected.** No account, no server, no analytics, no remote code. Every export and archive
-happens locally in your own browser. What the `debugger` / `downloads` / `storage` permissions are each
-used for is explained in [PRIVACY.md](PRIVACY.md).
+happens locally in your own browser. What each permission is used for is explained in
+[PRIVACY.md](PRIVACY.md).
 
-## Files
+## For developers
 
-| File | Purpose |
-|---|---|
-| `extract.js` | Extraction, rendering, button mounting; defines `window.__XAE_RUN(mode)` (MAIN world) |
-| `compose.js` | Markdown → Draft.js paste injection, the icon on the Article editor (MAIN world) |
-| `md2html.js` | Markdown → HTML that Draft understands, used by compose.js |
-| `net-hook.js` | GraphQL network interception (MAIN world, `document_start`) |
-| `bridge.js` | Isolated-world relay, MAIN ↔ background (MAIN has no `chrome.*`) |
-| `background.js` | `chrome.debugger` + `printToPDF` |
-| `viewer.html` / `viewer.js` | Extension page that renders the document in a separate process and triggers the download |
-| `extract.min.js` / `bookmarklet.txt` | Bookmarklet |
-| `x-article-exporter.user.js` | Userscript |
-| `test-renderRich.js` | Rich-text rendering unit tests, `node test-renderRich.js` |
+Architecture, the traps behind the design, and how to load the extension from source are in
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Unit tests: `node test-renderRich.js`.
 
 ## Related projects
 
@@ -285,9 +157,6 @@ standalone, zero-permission extensions:
 
 - [csdn-md-importer](https://github.com/wangsen2020/csdn-md-importer) — one-click Markdown into the CSDN editor, images uploaded automatically
 - [zhihu-md-importer](https://github.com/wangsen2020/zhihu-md-importer) — one-click Markdown into Zhihu columns, images uploaded automatically
-
-This repository focuses on doing one thing well for X: exporting Articles and threads, and importing
-Markdown into X's Article editor.
 
 ## License
 
