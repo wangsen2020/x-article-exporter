@@ -158,6 +158,11 @@ standalone, zero-permission extensions:
 - [csdn-md-importer](https://github.com/wangsen2020/csdn-md-importer) — one-click Markdown into the CSDN editor, images uploaded automatically
 - [zhihu-md-importer](https://github.com/wangsen2020/zhihu-md-importer) — one-click Markdown into Zhihu columns, images uploaded automatically
 
+More extensions for X from [GoodExts](https://goodexts.com):
+
+- [X Video Downloader](https://xdown.goodexts.com) — save videos, GIFs and photos from X in one click, with quality selection and a download history
+- [X Blocker](https://github.com/wangsen2020/x-quick-blocker) — one-click block and keyword / regex batch blocking for spam accounts on X
+
 ## License
 
 MIT
