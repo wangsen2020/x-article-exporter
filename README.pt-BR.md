@@ -17,7 +17,8 @@
 
 <p align="center">
   <b><a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">Instalar pela Chrome Web Store</a></b><br>
-  Grátis · sem clonar, sem build, sem modo de desenvolvedor · atualiza sozinha · funciona no Edge também
+  Grátis · sem clonar, sem build, sem modo de desenvolvedor · atualiza sozinha · funciona no Edge também<br>
+  🌐 <a href="https://xexport.goodexts.com/pt-br">Site, guias e perguntas frequentes: xexport.goodexts.com</a>
 </p>
 
 <p align="center">

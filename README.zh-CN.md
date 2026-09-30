@@ -17,7 +17,8 @@
 
 <p align="center">
   <b><a href="https://chromewebstore.google.com/detail/akmedeebhjkchcpocceffimhpmfjimhn">从 Chrome 网上应用店一键安装</a></b><br>
-  免费 · 不用克隆、不用打包、不用开开发者模式 · 自动更新 · Edge 也能装
+  免费 · 不用克隆、不用打包、不用开开发者模式 · 自动更新 · Edge 也能装<br>
+  🌐 <a href="https://xexport.goodexts.com/zh">官网、教程和常见问题：xexport.goodexts.com</a>
 </p>
 
 <p align="center">
