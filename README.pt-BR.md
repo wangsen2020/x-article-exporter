@@ -152,6 +152,10 @@ A arquitetura, as armadilhas que explicam o design e como carregar a extensão p
 exportações e arquivos são gerados localmente no seu navegador. Para que serve cada permissão
 (`debugger` / `downloads` / `storage`) está explicado em [PRIVACY.md](PRIVACY.md).
 
+Na primeira instalação abre-se um guia rápido no [site](https://xexport.goodexts.com/pt-br). Ao
+desinstalar, o Chrome abre uma página de feedback cujo endereço leva só a versão, o idioma do navegador
+e a data de instalação. Responder é opcional.
+
 ## Projetos relacionados
 
 A ideia de "simular um colar para usar o próprio uploader do editor" depois virou duas extensões

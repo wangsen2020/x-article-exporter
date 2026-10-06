@@ -146,6 +146,10 @@ Yes. Edge can install extensions from the Chrome Web Store directly.
 happens locally in your own browser. What each permission is used for is explained in
 [PRIVACY.md](PRIVACY.md).
 
+On first install the extension opens a short welcome guide on the [website](https://xexport.goodexts.com).
+On uninstall, Chrome opens a feedback page whose address carries only the extension version, browser
+language and install date. Answering it is optional.
+
 ## For developers
 
 Architecture, the traps behind the design, and how to load the extension from source are in

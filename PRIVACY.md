@@ -1,6 +1,6 @@
 # 隐私政策 / Privacy Policy
 
-**最后更新：2026-09-28**
+**最后更新：2026-10-06**
 
 扩展名称：X Article → PDF
 
@@ -57,6 +57,16 @@ Grok Markdown 功能（右键菜单里的「Grok Markdown」，只在你点了�
 这和你自己手动把内容粘给 Grok 是一回事，这段对话会出现在你自己的 Grok 历史里，受 X 的隐私政策
 约束。开发者和其他任何第三方都拿不到这些内容。
 
+### 产品官网页面
+
+首次安装时，扩展会打开产品官网（xexport.goodexts.com）的使用引导页。卸载时，Chrome 会打开
+官网的反馈页。这两个页面地址里只有扩展版本、浏览器界面语言、安装日期（已知时），以及标明
+来源的固定参数（`utm_source`、`utm_medium`、`ext=xap`）。地址里没有 X 账号、用户 ID、导出
+记录或归档内容。安装日期只存在本机的 `chrome.storage.local` 里，升级时不会补填。
+
+打开这两个页面是普通的浏览器跳转，不是扩展向后端发请求。反馈页上的内容只有你主动点提交才会
+发送，由[官网隐私政策](https://xexport.goodexts.com/zh/privacy-policy)说明。
+
 ### 数据的出售或转让
 
 不存在。没有数据被收集，因此也没有数据可被出售、转让或用于与功能无关的用途。
@@ -82,7 +92,7 @@ License: MIT
 
 # Privacy Policy (English)
 
-**Last updated: 2026-09-28**
+**Last updated: 2026-10-06**
 
 This extension **does not collect, store, or transmit any user data to the developer or any
 third party.** Everything happens locally in your own browser.
@@ -113,6 +123,15 @@ is the one feature that hands content to anyone else, and that is X itself: the 
 text to Grok as a prompt, and saves the Markdown Grok writes into your Downloads folder. It is the
 same as pasting the thread into Grok yourself; the conversation appears in your own Grok history
 and is governed by X's privacy policy. The developer and other third parties never see it.
+
+**Product website pages.** On first install the extension opens a welcome page on the product
+website (xexport.goodexts.com). When you uninstall it, Chrome opens the website's feedback page.
+Both addresses contain only the extension version, browser language, install date (when known)
+and fixed attribution parameters (`utm_source`, `utm_medium`, `ext=xap`); no X account, user ID,
+export history or archive content. The install date is kept in `chrome.storage.local` on your
+device, and updates do not fill in an unknown date. Opening these pages is browser navigation, not
+an extension backend request. Anything on the feedback page is sent only if you choose to submit
+it, and is covered by the [website privacy policy](https://xexport.goodexts.com/privacy-policy).
 
 No data is sold or transferred to third parties, because none is collected. This extension is
 not affiliated with, authorized, or endorsed by X Corp.

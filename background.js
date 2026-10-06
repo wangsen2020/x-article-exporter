@@ -7,7 +7,7 @@
 // 所有格式都统一走 viewer.html：它渲染正文、内联图片存档、产出文件，
 // 再由这里用 chrome.downloads 落盘——这样才拿得到完整的保存路径。
 
-importScripts('archive.js');
+importScripts('archive.js', 'site.js');
 
 // jobs 只存「回调」这种活不过重启的东西；任务负载放 chrome.storage.session。
 // MV3 的 service worker 会在空闲约 30s 后被回收，万字长文导出远超这个时间——
@@ -359,4 +359,44 @@ chrome.downloads.onChanged.addListener(async (delta) => {
     delete dl[delta.id];
     await chrome.storage.session.set({ dl });
   } catch (e) {}
+});
+
+// --- 产品官网 -------------------------------------------------------------
+// 首次安装打开子站的欢迎页；卸载时 Chrome 打开反馈页。都不需要额外权限。
+
+function siteDetails() {
+  return {
+    uiLang: chrome.i18n.getUILanguage(),
+    version: chrome.runtime.getManifest().version,
+  };
+}
+
+async function setUninstallUrl() {
+  try {
+    const { installedDate } = await chrome.storage.local.get('installedDate');
+    await chrome.runtime.setUninstallURL(self.XAESite.uninstallUrl({ ...siteDetails(), installed: installedDate }));
+  } catch (_) {
+    /* 官网地址设置失败不能拖垮 worker */
+  }
+}
+
+// worker 每次启动都设一遍（含浏览器重启）
+setUninstallUrl();
+
+chrome.runtime.onInstalled.addListener(async (details) => {
+  if (details.reason === 'install') {
+    try {
+      const { installedDate } = await chrome.storage.local.get('installedDate');
+      if (!installedDate) {
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+        await chrome.storage.local.set({ installedDate: date });
+      }
+      await chrome.tabs.create({ url: self.XAESite.welcomeUrl(siteDetails()) });
+    } catch (e) {
+      console.warn('Install welcome page failed:', e);
+    }
+  }
+  if (details.reason === 'install' || details.reason === 'update') await setUninstallUrl();
 });

@@ -132,6 +132,9 @@ PDF。运行期间 Chrome 一定会显示这条提示，导出完就消失。调
 **不收集任何数据。** 没有账号、没有服务器、没有统计、没有远程代码。所有导出和归档都在
 你自己的浏览器本地完成。各项权限分别用来做什么，详见 [PRIVACY.md](PRIVACY.md)。
 
+首次安装会打开[官网](https://xexport.goodexts.com/zh)的使用引导页。卸载时 Chrome 会打开一个
+反馈页，地址里只有扩展版本、浏览器语言和安装日期，填不填随你。
+
 ## 开发者
 
 内部实现、设计背后踩过的坑，以及怎么从源码加载，见 [docs/DEVELOPMENT.zh-CN.md](docs/DEVELOPMENT.zh-CN.md)。

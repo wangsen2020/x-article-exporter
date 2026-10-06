@@ -23,6 +23,8 @@ Bump `version` in `manifest.json` on every change, so a reload visibly picks up 
 | `extract.min.js` / `bookmarklet.txt` | Bookmarklet |
 | `x-article-exporter.user.js` | Userscript |
 | `test-renderRich.js` | Rich-text rendering unit tests, `node test-renderRich.js` |
+| `site.js` | Welcome / uninstall-feedback URLs on xexport.goodexts.com (pure functions, loaded by `background.js` via `importScripts`) |
+| `test/*.test.js` | `site.js` and the install/uninstall lifecycle, `node --test test/*.test.js` |
 
 ## The action-bar button
 

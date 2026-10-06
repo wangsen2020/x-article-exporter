@@ -153,6 +153,10 @@ desactualizadas).
 exportaciones y archivos se generan localmente en tu navegador. Para qué sirve cada permiso (`debugger`
 / `downloads` / `storage`) se explica en [PRIVACY.md](PRIVACY.md).
 
+Al instalarla por primera vez se abre una guía breve en el [sitio web](https://xexport.goodexts.com/es).
+Al desinstalarla, Chrome abre una página de comentarios cuya dirección solo lleva la versión, el idioma
+del navegador y la fecha de instalación. Responderla es opcional.
+
 ## Proyectos relacionados
 
 La idea de "simular un pegado para usar el propio cargador del editor" se separó después en dos
