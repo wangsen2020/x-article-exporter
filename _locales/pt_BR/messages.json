@@ -1,10 +1,10 @@
 {
   "extName": {
-    "message": "X Artigo para PDF - Exportar threads e artigos do X/Twitter",
+    "message": "XExport: X Artigo para PDF - Exportar threads e artigos do X",
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "Salve artigos, posts e threads do X (Twitter) em PDF, Google Docs, Google Drive, Markdown ou HTML. Importe Markdown no editor X.",
+    "message": "XExport salva artigos, posts e threads do X (Twitter) em PDF, Google Docs, Drive, Markdown ou HTML. Importe Markdown no editor.",
     "description": "Extension description"
   }
 }

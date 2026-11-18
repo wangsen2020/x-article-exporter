@@ -1,0 +1,10 @@
+{
+  "extName": {
+    "message": "XExport: X 长文与推文转 PDF · Google Docs 导出工具",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "XExport 一键将 X (Twitter) 长文、帖子与推文串保存为可搜索 PDF、Google Docs、Google Drive、Markdown 或离线 HTML，支持导入长文编辑器。",
+    "description": "Extension description"
+  }
+}

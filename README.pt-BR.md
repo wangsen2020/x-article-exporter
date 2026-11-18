@@ -27,9 +27,9 @@
   <img src="https://img.shields.io/badge/License-MIT-94a3b8?style=flat-square" alt="Licença MIT">
 </p>
 
-# X Article to PDF — Exporte Artigos e threads do Twitter para PDF, Google Docs e Markdown
+# XExport (X Article to PDF) — Exporte Artigos e threads do Twitter para PDF, Google Docs e Markdown
 
-**X Article to PDF** é uma extensão gratuita e de código aberto para o Chrome que salva **Artigos** e
+**XExport (X Article to PDF)** é uma extensão gratuita e de código aberto para o Chrome que salva **Artigos** e
 **threads** do X (Twitter) como PDF de verdade —texto selecionável e pesquisável, imagens na resolução
 original—, envia direto para **Google Docs** e **Google Drive (PDF)**, ou salva em Markdown e HTML
 autônomo em um clique. Sem janela de impressão e sem criar conta.

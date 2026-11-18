@@ -1,10 +1,10 @@
 {
   "extName": {
-    "message": "X مقالة إلى PDF - تصدير سلاسل ومقالات X/Twitter",
+    "message": "XExport: X مقالة إلى PDF - تصدير سلاسل ومقالات X/Twitter",
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "احفظ مقالات ومنشورات وسلاسل X (Twitter) بصيغة PDF أو Google Docs أو Google Drive أو Markdown أو HTML مع أرشيف محلي دون اتصال.",
+    "message": "يحفظ XExport مقالات ومنشورات وسلاسل X (Twitter) بصيغة PDF أو Google Docs أو Drive أو Markdown أو HTML مع أرشيف محلي دون اتصال.",
     "description": "Extension description"
   }
 }

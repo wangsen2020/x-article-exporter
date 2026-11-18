@@ -21,12 +21,12 @@
 
   const DATA = {
     zh: {
-      pageTitle: 'X Article → PDF · 图文使用教程',
+      pageTitle: 'XExport · X Article → PDF · 图文使用教程',
       brandSub: '完整图文操作指南',
       navHeading: '功能目录（7 项）',
       archiveBtn: '打开存档库',
       openXBtn: '去 X 试试 ↗',
-      heroTitle: 'X Article to PDF 完整功能教程',
+      heroTitle: 'XExport (X Article to PDF) 完整功能教程',
       heroLead: '左侧按功能跳转，右侧结合红框、箭头与序号标注快速上手全部 7 项核心能力：PDF 导出、Markdown / 离线 HTML、Google Docs 与 Google Drive 集成、Grok AI 整理成文、长文编辑器 Markdown 导入及本地存档库。',
       sections: [
         {
@@ -44,7 +44,7 @@
             toolbarPin: '1. 点拼图并固定图钉',
             popupGuide: '2. 浮窗右上角直达教程',
             reloadTab: '3. 装好后点一次刷新抓全推文串',
-            popupTitle: 'X Article → PDF',
+            popupTitle: 'XExport · X → PDF',
             popupBtnGuide: '使用教程',
             popupStatus: '当前帖子可一键导出',
             popupPdf: '导出为 PDF',
@@ -184,12 +184,12 @@
       ],
     },
     en: {
-      pageTitle: 'X Article → PDF · Visual Guide',
+      pageTitle: 'XExport · X Article → PDF · Visual Guide',
       brandSub: 'Complete Annotated Guide',
       navHeading: 'Features (7)',
       archiveBtn: 'Open Archive',
       openXBtn: 'Open X ↗',
-      heroTitle: 'X Article to PDF — Complete Feature Guide',
+      heroTitle: 'XExport (X Article to PDF) — Complete Feature Guide',
       heroLead: 'Jump to any workflow on the left. Every section pairs concise steps with red-box and arrow callouts covering PDF export, Markdown & offline HTML, Google Docs & Drive integration, Grok AI rewrite, X Article Markdown import, and local archive history.',
       sections: [
         {
@@ -207,7 +207,7 @@
             toolbarPin: '1. Pin icon to Chrome toolbar',
             popupGuide: '2. Top-right Guide button in popup',
             reloadTab: '3. Reload thread tab once (F5)',
-            popupTitle: 'X Article → PDF',
+            popupTitle: 'XExport · X → PDF',
             popupBtnGuide: 'Guide',
             popupStatus: 'Ready to export this post',
             popupPdf: 'Export as PDF',
@@ -347,12 +347,12 @@
       ],
     },
     es: {
-      pageTitle: 'X Artículo a PDF · Guía Visual',
+      pageTitle: 'XExport · X Artículo a PDF · Guía Visual',
       brandSub: 'Guía visual completa',
       navHeading: 'Funciones (7)',
       archiveBtn: 'Abrir archivo',
       openXBtn: 'Abrir X ↗',
-      heroTitle: 'Guía completa de X Article to PDF',
+      heroTitle: 'Guía completa de XExport (X Article to PDF)',
       heroLead: 'Navega por cada función a la izquierda. Cada módulo incluye pasos claros y capturas con recuadros y flechas rojas: PDF buscable, Markdown, HTML sin conexión, Google Docs y Google Drive, Grok Markdown, importación al editor de X y archivo local.',
       sections: [
         {
@@ -370,7 +370,7 @@
             toolbarPin: '1. Fijar en la barra',
             popupGuide: '2. Botón Guía arriba a la derecha',
             reloadTab: '3. Recargar el hilo una vez (F5)',
-            popupTitle: 'X Article → PDF',
+            popupTitle: 'XExport · X → PDF',
             popupBtnGuide: 'Guía',
             popupStatus: 'Listo para exportar este post',
             popupPdf: 'Exportar a PDF',
@@ -510,12 +510,12 @@
       ],
     },
     pt: {
-      pageTitle: 'X Artigo para PDF · Guia Visual',
+      pageTitle: 'XExport · X Artigo para PDF · Guia Visual',
       brandSub: 'Guia visual completo',
       navHeading: 'Recursos (7)',
       archiveBtn: 'Abrir acervo',
       openXBtn: 'Abrir X ↗',
-      heroTitle: 'Guia completo do X Article to PDF',
+      heroTitle: 'Guia completo do XExport (X Article to PDF)',
       heroLead: 'Navegue pelos recursos à esquerda. Cada seção traz passos diretos com destaques e setas vermelhas: PDF pesquisável, Markdown, HTML offline, Google Docs e Drive, Grok AI, importação para Artigos do X e acervo local.',
       sections: [
         {
@@ -533,7 +533,7 @@
             toolbarPin: '1. Fixar ícone na barra',
             popupGuide: '2. Botão Guia no topo direito',
             reloadTab: '3. Recarregar thread (F5)',
-            popupTitle: 'X Article → PDF',
+            popupTitle: 'XExport · X → PDF',
             popupBtnGuide: 'Guia',
             popupStatus: 'Pronto para exportar este post',
             popupPdf: 'Exportar PDF',
@@ -673,12 +673,12 @@
       ],
     },
     ja: {
-      pageTitle: 'X記事→PDF変換 · ビジュアルガイド',
+      pageTitle: 'XExport · X記事→PDF変換 · ビジュアルガイド',
       brandSub: '機能別・図解ガイド',
       navHeading: '機能一覧（7項目）',
       archiveBtn: '履歴・アーカイブ',
       openXBtn: 'Xを開く ↗',
-      heroTitle: 'X Article to PDF 完全操作ガイド',
+      heroTitle: 'XExport (X Article to PDF) 完全操作ガイド',
       heroLead: '左の目次から各機能へ移動できます。赤枠と矢印で操作位置をわかりやすく示し、PDF書き出し・Markdown/HTML・Google Docs/Drive連携・Grok要約・記事エディタ取込・アーカイブ管理を解説します。',
       sections: [
         {
@@ -696,7 +696,7 @@
             toolbarPin: '1. ツールバーにピン留め',
             popupGuide: '2. 右上のガイドボタン',
             reloadTab: '3. 導入後に1度再読み込み(F5)',
-            popupTitle: 'X Article → PDF',
+            popupTitle: 'XExport · X → PDF',
             popupBtnGuide: 'ガイド',
             popupStatus: 'この投稿をエクスポート可能',
             popupPdf: 'PDF で保存',
@@ -836,12 +836,12 @@
       ],
     },
     id: {
-      pageTitle: 'X Artikel ke PDF · Panduan Visual',
+      pageTitle: 'XExport · X Artikel ke PDF · Panduan Visual',
       brandSub: 'Panduan Lengkap Beranotasi',
       navHeading: 'Fitur (7)',
       archiveBtn: 'Buka Arsip',
       openXBtn: 'Buka X ↗',
-      heroTitle: 'Panduan Lengkap X Article to PDF',
+      heroTitle: 'Panduan Lengkap XExport (X Article to PDF)',
       heroLead: 'Pilih fitur di sebelah kiri. Setiap bagian menampilkan langkah ringkas serta diagram kotak merah dan panah untuk PDF, Markdown, HTML offline, Google Docs & Drive, Grok AI, impor editor X, dan arsip lokal.',
       sections: [
         {
@@ -859,7 +859,7 @@
             toolbarPin: '1. Sematkan di bilah alat',
             popupGuide: '2. Tombol Panduan di kanan atas',
             reloadTab: '3. Refresh tab thread sekali (F5)',
-            popupTitle: 'X Article → PDF',
+            popupTitle: 'XExport · X → PDF',
             popupBtnGuide: 'Panduan',
             popupStatus: 'Siap mengekspor postingan ini',
             popupPdf: 'Ekspor PDF',
@@ -999,12 +999,12 @@
       ],
     },
     ar: {
-      pageTitle: 'X مقالة إلى PDF · الدليل المصور',
+      pageTitle: 'XExport · X مقالة إلى PDF · الدليل المصور',
       brandSub: 'الدليل الشامل المشروح',
       navHeading: 'الميزات (7)',
       archiveBtn: 'فتح الأرشيف',
       openXBtn: 'فتح X ↗',
-      heroTitle: 'الدليل الشامل لإضافة X Article to PDF',
+      heroTitle: 'الدليل الشامل لإضافة XExport (X Article to PDF)',
       heroLead: 'اختر القسم من القائمة الجانبية. يتضمن كل قسم خطوات مختصرة مع رسوم توضيحية بإطارات وأسهم حمراء لجميع الميزات السبع: تصدير PDF، وMarkdown وHTML دون اتصال، ومزامنة Google Docs وDrive، وتلخيص Grok، واستيراد Markdown لمحرر X، والأرشيف المحلي.',
       sections: [
         {
@@ -1022,7 +1022,7 @@
             toolbarPin: '1. تثبيت الأيقونة في الشريط',
             popupGuide: '2. زر الدليل في الأعلى',
             reloadTab: '3. تحديث الصفحة مرة واحدة (F5)',
-            popupTitle: 'X Article → PDF',
+            popupTitle: 'XExport · X → PDF',
             popupBtnGuide: 'الدليل',
             popupStatus: 'جاهز لتصدير هذا المنشور',
             popupPdf: 'تصدير PDF',

@@ -27,9 +27,9 @@
   <img src="https://img.shields.io/badge/License-MIT-94a3b8?style=flat-square" alt="MIT License">
 </p>
 
-# X Article to PDF：推特长文、推文串一键导出 PDF / Google Docs / Markdown
+# XExport（X Article to PDF）：推特长文、推文串一键导出 PDF / Google Docs / Markdown
 
-**X Article to PDF** 是一个免费开源的 Chrome 扩展：把 X（Twitter）的 **Article 长文**和**推文串**
+**XExport（X Article to PDF）** 是一个免费开源的 Chrome 扩展：把 X（Twitter）的 **Article 长文**和**推文串**
 一键存成真正的 PDF——文字可选中、可搜索，图片保持原图分辨率——也支持一键转存至
 **Google Docs 在线文档**、**Google Drive（PDF 云盘）**、Markdown 与自包含 HTML。不弹打印框、不用手动复制排版。
 
