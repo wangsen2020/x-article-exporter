@@ -1,10 +1,10 @@
 {
   "extName": {
-    "message": "X記事→PDF変換 - X/Twitterのスレッド・記事をエクスポート",
+    "message": "XExport: X記事→PDF変換 - X/Twitterのスレッド・記事を保存",
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "X(Twitter)の記事・ポスト・スレッドをPDF、Googleドキュメント、Googleドライブ、Markdown、HTMLで保存。Markdown取込対応。",
+    "message": "XExportでX(Twitter)の記事・ポスト・スレッドをPDF、Googleドキュメント、Drive、Markdown、HTMLで保存。Markdown取込対応。",
     "description": "Extension description"
   }
 }

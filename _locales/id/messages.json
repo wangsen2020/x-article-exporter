@@ -1,10 +1,10 @@
 {
   "extName": {
-    "message": "X Artikel ke PDF - Ekspor Thread & Artikel X/Twitter",
+    "message": "XExport: X Artikel ke PDF - Ekspor Thread & Artikel X/Twitter",
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "Simpan Artikel, post & thread X (Twitter) ke PDF, Google Docs, Google Drive, Markdown, atau HTML. Impor Markdown ke editor X.",
+    "message": "XExport simpan Artikel, post & thread X (Twitter) ke PDF, Google Docs, Drive, Markdown, atau HTML. Impor Markdown ke editor X.",
     "description": "Extension description"
   }
 }

@@ -1,10 +1,10 @@
 {
   "extName": {
-    "message": "X Artículo a PDF - Exportar hilos y artículos de X/Twitter",
+    "message": "XExport: X Artículo a PDF - Exportar hilos y artículos de X",
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "Guarda artículos, posts e hilos de X (Twitter) en PDF, Google Docs, Google Drive, Markdown o HTML. Importa Markdown al editor X.",
+    "message": "XExport guarda artículos, posts e hilos de X (Twitter) en PDF, Google Docs, Drive, Markdown o HTML. Importa Markdown al editor.",
     "description": "Extension description"
   }
 }

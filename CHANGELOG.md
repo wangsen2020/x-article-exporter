@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.8.1
+
+- Added the official **XExport** brand identity (`short_name: "XExport"`, updated all Chrome Web Store locale titles and summaries, added `zh_CN` locale strings, and updated the popup, visual guide, archive header, and README docs).
+
 ## 2.8.0
 
 - Added optional on-demand Google Docs (`↗ Google Docs`) and Google Drive PDF (`↗ Google Drive (PDF)`) integration across the post format menu, popup, and local archive cards.
