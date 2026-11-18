@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "Export X (Twitter) Articles & threads to searchable PDF, Markdown or HTML. Import Markdown into X's editor. Offline archive too.",
+    "message": "Save X (Twitter) Articles, posts & threads to PDF, Google Docs, Google Drive, Markdown or HTML. Import Markdown into X Articles.",
     "description": "Extension description"
   }
 }

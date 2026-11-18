@@ -46,6 +46,11 @@ window.addEventListener('message', (e) => {
     return;
   }
 
+  if (e.data.__xae === 'openGuide') {
+    if (alive()) { try { chrome.runtime.sendMessage({ cmd: 'openGuide' }); } catch (err) {} }
+    return;
+  }
+
   if (e.data.__xae !== 'export') return;
   const { format, doc, md, title, meta } = e.data;
 
@@ -74,9 +79,14 @@ window.addEventListener('message', (e) => {
       }
       reply({
         ok: !!(resp && resp.ok),
+        cancelled: !!(resp && resp.cancelled),
         error: (err && err.message) || (resp && resp.error),
+        guideUrl: (resp && resp.guideUrl) || '',
         archived: !!(resp && resp.archived),
         blocks: resp && resp.blocks,
+        webViewLink: (resp && resp.webViewLink) || '',
+        fileId: (resp && resp.fileId) || '',
+        filename: (resp && resp.filename) || '',
         format,
       });
     });
@@ -121,6 +131,16 @@ try {
       window.postMessage({ __xae: 'progress', text: msg.progress }, '*');
       return;
     }
-    reply({ ok: !!msg.ok, error: msg.error, archived: !!msg.archived, format: msg.format });
+    reply({
+      ok: !!msg.ok,
+      cancelled: !!msg.cancelled,
+      error: msg.error,
+      guideUrl: msg.guideUrl || '',
+      archived: !!msg.archived,
+      webViewLink: msg.webViewLink || '',
+      fileId: msg.fileId || '',
+      filename: msg.filename || '',
+      format: msg.format,
+    });
   });
 } catch (e) {}

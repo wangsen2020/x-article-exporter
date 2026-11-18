@@ -67,7 +67,10 @@
     if (rec.blocks) addChip(rec.blocks + ' 块');
     if (rec.images && rec.images.total) addChip(`图 ${rec.images.inlined}/${rec.images.total}`);
     addChip(fmtBytes(rec.bytes));
-    (rec.files || []).forEach((f) => addChip(String(f.format || '').toUpperCase()));
+    (rec.files || []).forEach((f) => {
+      const fmt = String(f.format || '').toLowerCase();
+      addChip(fmt === 'gdoc' ? 'Google Docs' : fmt === 'gdrive' ? 'Google Drive' : fmt.toUpperCase());
+    });
     body.appendChild(chips);
 
     const acts = document.createElement('div');
@@ -81,6 +84,83 @@
     });
     acts.appendChild(bOpen);
 
+    // 云端 Google Docs 按钮：未上传时一键把本地快照转存为 Google Doc（按需拉起授权），已上传则直达在线文档
+    const gdocFile = [...(rec.files || [])].reverse().find((f) => f.format === 'gdoc' && f.webViewLink);
+    const gdriveFile = [...(rec.files || [])].reverse().find((f) => f.format === 'gdrive' && f.webViewLink);
+    let guideBox = null;
+    if (gdocFile) {
+      const bCloud = document.createElement('button');
+      bCloud.textContent = '打开 Google Doc ↗';
+      bCloud.title = `${gdocFile.filename || rec.title || 'Google Docs'}\n${gdocFile.webViewLink}`;
+      bCloud.addEventListener('click', () => chrome.tabs.create({ url: gdocFile.webViewLink }));
+      acts.appendChild(bCloud);
+    } else if (typeof XAEGDrive !== 'undefined') {
+      const bUpDoc = document.createElement('button');
+      bUpDoc.textContent = '↗ Google Docs';
+      bUpDoc.title = '将本地快照上传并转换为 Google Docs 在线文档（首次使用会弹出 Google 授权窗）';
+      bUpDoc.addEventListener('click', async () => {
+        if (bUpDoc.disabled) return;
+        bUpDoc.disabled = true;
+        bUpDoc.textContent = '正在读取快照…';
+        if (guideBox) { guideBox.remove(); guideBox = null; }
+        try {
+          const html = await XAEArchive.snapshot(rec.id);
+          if (!html) throw new Error('本地快照为空');
+          const up = await XAEGDrive.uploadAsGoogleDoc({
+            title: rec.title || 'X Article',
+            html,
+            meta: rec,
+            onInteractiveStart: () => {
+              bUpDoc.textContent = '等待授权…';
+            },
+            onProgress: (txt) => {
+              if (txt && txt.includes('授权')) bUpDoc.textContent = '等待授权…';
+              else bUpDoc.textContent = txt.replace(/^正在/, '').replace(/…$/, '') || '上传中…';
+            },
+          });
+          await XAEArchive.addFile(rec.id, {
+            format: 'gdoc',
+            filename: up.name,
+            fileId: up.id,
+            webViewLink: up.webViewLink,
+            at: Date.now(),
+          });
+          await refresh();
+        } catch (e) {
+          bUpDoc.disabled = false;
+          const cancelled = XAEGDrive.isAuthCancelError && XAEGDrive.isAuthCancelError(e);
+          bUpDoc.textContent = cancelled ? '已取消授权' : '上传失败';
+          bUpDoc.title = (e && e.message) || String(e);
+          if (e && e.guideUrl) {
+            guideBox = document.createElement('div');
+            guideBox.className = 'path';
+            const b = document.createElement('b');
+            b.textContent = '需要开启服务：';
+            const a = document.createElement('a');
+            a.href = e.guideUrl;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.textContent = '点击开启 Google Drive API ↗';
+            guideBox.appendChild(b);
+            guideBox.appendChild(a);
+            body.appendChild(guideBox);
+          }
+          setTimeout(() => {
+            bUpDoc.textContent = '↗ Google Docs';
+          }, 3000);
+        }
+      });
+      acts.appendChild(bUpDoc);
+    }
+
+    if (gdriveFile) {
+      const bDrivePdf = document.createElement('button');
+      bDrivePdf.textContent = '打开云端 PDF ↗';
+      bDrivePdf.title = `${gdriveFile.filename || 'PDF'}\n${gdriveFile.webViewLink}`;
+      bDrivePdf.addEventListener('click', () => chrome.tabs.create({ url: gdriveFile.webViewLink }));
+      acts.appendChild(bDrivePdf);
+    }
+
     if (rec.url) {
       const bSrc = document.createElement('button');
       bSrc.textContent = '原帖';
@@ -89,14 +169,14 @@
       acts.appendChild(bSrc);
     }
 
-    const lastFile = (rec.files || [])[rec.files.length - 1];
-    if (lastFile && lastFile.downloadId !== undefined) {
+    const lastLocalFile = [...(rec.files || [])].reverse().find((f) => f.downloadId !== undefined);
+    if (lastLocalFile && lastLocalFile.downloadId !== undefined) {
       const bShow = document.createElement('button');
       bShow.textContent = '在文件夹中显示';
       bShow.addEventListener('click', () => {
         // 文件可能已被用户手动删掉，show() 会静默失败，这里给一句提示
-        chrome.downloads.search({ id: lastFile.downloadId }, (items) => {
-          if (items && items[0] && items[0].exists) chrome.downloads.show(lastFile.downloadId);
+        chrome.downloads.search({ id: lastLocalFile.downloadId }, (items) => {
+          if (items && items[0] && items[0].exists) chrome.downloads.show(lastLocalFile.downloadId);
           else bShow.textContent = '文件已不在';
         });
       });
@@ -120,13 +200,35 @@
 
     body.appendChild(acts);
 
-    if (lastFile && lastFile.filename) {
+    if ((lastLocalFile && lastLocalFile.filename) || gdocFile || gdriveFile) {
       const p = document.createElement('div');
       p.className = 'path';
-      const b = document.createElement('b');
-      b.textContent = '已保存到：';
-      p.appendChild(b);
-      p.appendChild(document.createTextNode(lastFile.filename));
+      const appendCloudRow = (label, fileRec, fallbackName) => {
+        const row = document.createElement('div');
+        const b = document.createElement('b');
+        b.textContent = label;
+        const a = document.createElement('a');
+        a.href = fileRec.webViewLink;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = (fileRec.filename || fallbackName) + ' ↗';
+        row.appendChild(b);
+        row.appendChild(a);
+        if (fileRec.at) {
+          row.appendChild(document.createTextNode('（' + fmtDate(fileRec.at) + '）'));
+        }
+        p.appendChild(row);
+      };
+      if (lastLocalFile && lastLocalFile.filename) {
+        const row = document.createElement('div');
+        const b = document.createElement('b');
+        b.textContent = '已保存到：';
+        row.appendChild(b);
+        row.appendChild(document.createTextNode(lastLocalFile.filename));
+        p.appendChild(row);
+      }
+      if (gdocFile) appendCloudRow('Google Docs：', gdocFile, rec.title || '在线文档');
+      if (gdriveFile) appendCloudRow('Google Drive：', gdriveFile, (rec.title || 'x-export') + '.pdf');
       body.appendChild(p);
     }
 
@@ -158,6 +260,13 @@
   }
 
   qBox.addEventListener('input', render);
+
+  const guideBtn = $('openGuide');
+  if (guideBtn) {
+    guideBtn.addEventListener('click', () => {
+      chrome.tabs.create({ url: chrome.runtime.getURL('guide.html') });
+    });
+  }
 
   $('save').addEventListener('click', async () => {
     const cap = Math.max(0, parseInt(capBox.value, 10) || 0);

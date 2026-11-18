@@ -7,7 +7,7 @@
 // 所有格式都统一走 viewer.html：它渲染正文、内联图片存档、产出文件，
 // 再由这里用 chrome.downloads 落盘——这样才拿得到完整的保存路径。
 
-importScripts('archive.js', 'site.js');
+importScripts('archive.js', 'site.js', 'gdrive.js');
 
 // jobs 只存「回调」这种活不过重启的东西；任务负载放 chrome.storage.session。
 // MV3 的 service worker 会在空闲约 30s 后被回收，万字长文导出远超这个时间——
@@ -227,11 +227,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   // 内容脚本发起一次导出
   if (msg.cmd === 'export') {
     const id = String(Date.now()) + Math.random().toString(36).slice(2, 8);
+    const format = msg.format || 'pdf';
+    const isCloud = format === 'gdoc' || format === 'gdrive';
     const payload = {
       doc: msg.doc,
       md: msg.md,
       title: msg.title,
-      format: msg.format || 'pdf',
+      format,
       meta: msg.meta || {},
       // 发起页的 tabId 也存进 session：worker 被回收后，回执还得找得到人
       srcTabId: (sender.tab && sender.tab.id) || null,
@@ -246,11 +248,54 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           if (p) chrome.storage.session.set({ [jobKey(id)]: Object.assign(p, { tabId: tab.id }) });
         });
       });
-    // storage 写失败（超配额等）时也要回报，否则页面侧只能干等到超时
-    chrome.storage.session.set({ [jobKey(id)]: payload }).then(openViewer, (e) => {
-      tell(id, payload.srcTabId, { ok: false, error: 'session storage: ' + ((e && e.message) || e) });
-      jobs.delete(id);
-    });
+    const startPipeline = () => {
+      // storage 写失败（超配额等）时也要回报，否则页面侧只能干等到超时
+      chrome.storage.session.set({ [jobKey(id)]: payload }).then(openViewer, (e) => {
+        tell(id, payload.srcTabId, { ok: false, error: 'session storage: ' + ((e && e.message) || e), format });
+        jobs.delete(id);
+      });
+    };
+    if (isCloud && self.XAEGDrive) {
+      // 纯按需授权：仅当用户点击 Google Docs / Google Drive 导出时才检查/拉起授权窗
+      let authBeat = 0;
+      const authMsg = self.XAEGDrive.AUTH_WAIT_PROMPT || '正在等待 Google 账号授权…';
+      const pushAuthProgress = () => {
+        if (payload.srcTabId) {
+          try {
+            chrome.tabs.sendMessage(payload.srcTabId, {
+              cmd: 'push',
+              progress: authMsg,
+            }).catch(() => {});
+          } catch (e) {}
+        }
+      };
+      self.XAEGDrive.ensureToken({
+        interactive: true,
+        onInteractiveStart: () => {
+          pushAuthProgress();
+          authBeat = setInterval(pushAuthProgress, 15000);
+        },
+      }).then(
+        () => {
+          if (authBeat) clearInterval(authBeat);
+          startPipeline();
+        },
+        (err) => {
+          if (authBeat) clearInterval(authBeat);
+          const cancelled = self.XAEGDrive.isAuthCancelError(err);
+          tell(id, payload.srcTabId, {
+            ok: false,
+            cancelled,
+            error: (err && err.message) || String(err),
+            guideUrl: (err && err.guideUrl) || '',
+            format,
+          });
+          jobs.delete(id);
+        }
+      );
+    } else {
+      startPipeline();
+    }
     return true; // 异步回复
   }
 
@@ -316,9 +361,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       const p = (await chrome.storage.session.get(jobKey(msg.id)))[jobKey(msg.id)] || {};
       await tell(msg.id, j.srcTabId || p.srcTabId, {
         ok: !!msg.ok,
+        cancelled: !!msg.cancelled,
         error: msg.error || j.printError,
+        guideUrl: msg.guideUrl || '',
         archived: !!msg.archived,
         format: msg.format || p.format,
+        webViewLink: msg.webViewLink || '',
+        fileId: msg.fileId || '',
+        filename: msg.filename || '',
       });
       const t = viewerTab || p.tabId;
       if (t) chrome.tabs.remove(t).catch(() => {});
@@ -330,6 +380,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
   if (msg.cmd === 'openOptions') {
     chrome.runtime.openOptionsPage();
+    return false;
+  }
+
+  if (msg.cmd === 'openGuide') {
+    chrome.tabs.create({ url: chrome.runtime.getURL('guide.html') });
     return false;
   }
 
