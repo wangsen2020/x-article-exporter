@@ -2,19 +2,27 @@
   "manifest_version": 3,
   "default_locale": "en",
   "name": "__MSG_extName__",
-  "version": "2.7.1",
+  "version": "2.8.0",
   "description": "__MSG_extDescription__",
   "permissions": [
     "debugger",
     "downloads",
+    "identity",
     "storage",
     "unlimitedStorage"
   ],
   "host_permissions": [
     "https://x.com/*",
     "https://twitter.com/*",
-    "https://pbs.twimg.com/*"
+    "https://pbs.twimg.com/*",
+    "https://www.googleapis.com/*"
   ],
+  "oauth2": {
+    "client_id": "51782706977-0jrjqmeilsv9hoaaudif7i99kdnk195q.apps.googleusercontent.com",
+    "scopes": [
+      "https://www.googleapis.com/auth/drive.file"
+    ]
+  },
   "options_page": "options.html",
   "icons": {
     "16": "icons/icon16.png",
@@ -39,7 +47,8 @@
     {
       "resources": [
         "viewer.html",
-        "viewer.js"
+        "viewer.js",
+        "gdrive.js"
       ],
       "matches": [
         "https://x.com/*",

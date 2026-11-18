@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X Article → PDF · Guide</title>
+<style>
+  :root{
+    --bg:#f8fafc; --card:#ffffff; --fg:#0f1419; --mut:#536471; --line:#e1e8ed;
+    --acc:#1d9bf0; --acc-soft:#eff8ff; --brand:#e02424; --chip:#f1f5f9;
+    --red:#ef4444; --red-soft:rgba(239,68,68,.09); --green:#10b981;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15202b; --card:#1e2732; --fg:#e7e9ea; --mut:#8b98a5; --line:#38444d;
+      --acc:#38bdf8; --acc-soft:rgba(29,155,240,.14); --brand:#f4212e; --chip:#273340;
+      --red:#f87171; --red-soft:rgba(248,113,113,.13); --green:#34d399;
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--fg);
+    font:15px/1.65 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  }
+
+  .topbar{
+    position:sticky; top:0; z-index:30; background:var(--card);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    max-width:1180px; margin:0 auto; padding:10px 20px;
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; text-decoration:none; color:var(--fg); min-width:0}
+  .brand svg{width:24px; height:24px; flex:none; margin-inline-end:10px}
+  .brand-title{font-size:15px; font-weight:700; white-space:nowrap; letter-spacing:-0.01em}
+  .brand-sub{font-size:12px; color:var(--mut); margin-inline-start:10px; white-space:nowrap}
+
+  .top-actions{display:flex; align-items:center; flex-wrap:nowrap}
+  .ctrl{
+    display:inline-flex; align-items:center; justify-content:center;
+    height:30px; padding:0 10px; border-radius:6px; border:1px solid var(--line);
+    background:var(--card); color:var(--fg); font:inherit; font-size:12px; font-weight:500;
+    text-decoration:none; cursor:pointer; white-space:nowrap;
+    margin-inline-end:10px;
+  }
+  .ctrl:last-child{margin-inline-end:0}
+  .ctrl:hover{background:var(--chip); border-color:var(--acc)}
+  .ctrl.primary{background:var(--acc); color:#fff; border-color:transparent; font-weight:600}
+  .ctrl.primary:hover{filter:brightness(1.07)}
+  select.ctrl{padding:0 8px}
+
+  .layout{
+    max-width:1180px; margin:0 auto; padding:24px 20px 64px;
+    display:flex; align-items:flex-start;
+  }
+
+  .sidebar{
+    width:240px; flex:none; position:sticky; top:68px;
+    margin-inline-end:28px;
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:10px;
+  }
+  .nav-heading{
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
+    color:var(--mut); padding:4px 10px 8px;
+  }
+  .nav-list{list-style:none; margin:0; padding:0}
+  .nav-list li{margin-bottom:4px}
+  .nav-list li:last-child{margin-bottom:0}
+  .nav-link{
+    display:flex; align-items:center; width:100%; min-height:32px;
+    padding:6px 10px; border-radius:8px; text-decoration:none; color:var(--fg);
+    font-size:13px; line-height:1.35; transition:background .15s,color .15s;
+  }
+  .nav-link:hover{background:var(--chip)}
+  .nav-link.active{background:var(--acc-soft); color:var(--acc); font-weight:600}
+  .nav-num{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:18px; height:18px; border-radius:999px; flex:none;
+    background:var(--chip); color:var(--mut); font-size:11px; font-weight:700;
+    margin-inline-end:8px;
+  }
+  .nav-link.active .nav-num{background:var(--acc); color:#fff}
+
+  .content{flex:1; min-width:0}
+  .hero{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:20px 22px; margin-bottom:20px;
+  }
+  .hero h1{margin:0 0 6px; font-size:22px; line-height:1.3; letter-spacing:-0.015em}
+  .hero p{margin:0; color:var(--mut); font-size:14px}
+
+  .module{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:22px; margin-bottom:20px; scroll-margin-top:68px;
+  }
+  .mod-head{display:flex; align-items:center; margin-bottom:10px}
+  .mod-badge{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:24px; height:24px; border-radius:999px; background:var(--red); color:#fff;
+    font-size:12px; font-weight:700; flex:none; margin-inline-end:10px;
+  }
+  .mod-title{margin:0; font-size:18px; line-height:1.3; font-weight:700}
+  .mod-desc{margin:0 0 12px; color:var(--mut); font-size:14px}
+
+  .steps{margin:0 0 16px; padding-inline-start:20px; font-size:14px}
+  .steps li{margin-bottom:6px}
+  .steps li:last-child{margin-bottom:0}
+
+  .diagram-card{
+    border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    background:var(--chip); padding:10px;
+  }
+  .diagram-card svg{display:block; width:100%; height:auto; border-radius:8px; background:#ffffff}
+  .diagram-cap{
+    margin:8px 2px 2px; font-size:12px; color:var(--mut);
+    display:flex; align-items:center;
+  }
+  .cap-dot{
+    width:8px; height:8px; border-radius:50%; background:var(--red);
+    flex:none; margin-inline-end:6px;
+  }
+
+  .tip-box{
+    margin-top:12px; padding:10px 12px; border-radius:8px;
+    background:var(--acc-soft); font-size:13px; color:var(--fg);
+  }
+
+  @media (max-width: 860px){
+    .topbar-inner{padding:10px 14px}
+    .brand{margin-bottom:8px}
+    .brand-sub{display:none}
+    .layout{display:block; padding:14px 14px 48px}
+    .sidebar{
+      width:100%; position:static; margin-inline-end:0; margin-bottom:16px;
+      padding:8px 10px; overflow-x:auto;
+    }
+    .nav-list{display:flex; flex-wrap:nowrap}
+    .nav-list li{margin-bottom:0; margin-inline-end:8px; flex:none}
+    .nav-list li:last-child{margin-inline-end:0}
+    .nav-link{white-space:nowrap}
+    .module{padding:16px}
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect width="24" height="24" rx="6" fill="#e02424"/>
+          <path fill="#fff" fill-rule="evenodd" d="M7.5 5h6.2L18 9.3V18a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 18V6.5A1.5 1.5 0 0 1 7.5 5Zm5.5 1.3V10h3.7L13 6.3Z"/>
+          <path fill="#fff" d="M11.3 11.2h1.4v3.4l1-1 .95.95-2.65 2.65-2.65-2.65.95-.95 1 1v-3.4Z"/>
+        </svg>
+        <span class="brand-title" id="brandTitle">X Article → PDF</span>
+        <span class="brand-sub" id="brandSub">Complete Visual Guide</span>
+      </div>
+      <div class="top-actions">
+        <select class="ctrl" id="langSelect" aria-label="Language">
+          <option value="zh">简体中文</option>
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="pt">Português</option>
+          <option value="ja">日本語</option>
+          <option value="id">Bahasa Indonesia</option>
+          <option value="ar">العربية</option>
+        </select>
+        <button class="ctrl" id="btnArchive" type="button">Archive</button>
+        <a class="ctrl primary" id="btnOpenX" href="https://x.com/home" target="_blank" rel="noopener">Open X ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Guide sections">
+      <div class="nav-heading" id="navHeading">Features</div>
+      <ul class="nav-list" id="navList"></ul>
+    </aside>
+
+    <main class="content">
+      <section class="hero">
+        <h1 id="heroTitle"></h1>
+        <p id="heroLead"></p>
+      </section>
+      <div id="sectionsRoot"></div>
+    </main>
+  </div>
+
+<script src="guide.js"></script>
+</body>
+</html>

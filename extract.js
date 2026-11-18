@@ -76,7 +76,10 @@
       fmtMd: 'Markdown',
       fmtHtml: 'HTML (self-contained)',
       fmtGrok: 'Grok Markdown (AI rewrite)',
+      fmtGDoc: '↗ Google Docs',
+      fmtGDrive: '↗ Google Drive (PDF)',
       openArchive: 'Archive…',
+      openGuide: 'Visual Guide…',
       grokWorking: 'Sent to Grok — rewriting as a Markdown article (Expert mode can take a few minutes)…',
       grokDone: 'Grok Markdown saved — check your downloads',
       grokFailed: (e) => `Grok failed (${e}) — the plain Markdown option still works`,
@@ -95,9 +98,21 @@
       inlining: (d, t) => `Inlining images ${d}/${t}…`,
       htmlDone: (blocks, ok, total) => `HTML downloaded — ${blocks} blocks, ${ok}/${total} images inlined`,
       pdfWorking: 'Generating PDF…',
+      gdocWorking: 'Uploading to Google Docs…',
+      gdriveWorking: 'Generating PDF & uploading to Google Drive…',
       exporting: 'Exporting…',
       exportDone: (fmt) => `${String(fmt || '').toUpperCase()} saved — check your downloads`,
       exportDoneArchived: (fmt) => `${String(fmt || '').toUpperCase()} saved · snapshot archived`,
+      gdocDone: 'Uploaded to Google Docs',
+      gdocDoneArchived: 'Uploaded to Google Docs · snapshot archived',
+      gdriveDone: 'PDF uploaded to Google Drive',
+      gdriveDoneArchived: 'PDF uploaded to Google Drive · snapshot archived',
+      openGDocNow: 'Open Google Doc ↗',
+      openGDriveNow: 'Open in Drive ↗',
+      openEnableApi: 'Enable Google Drive API ↗',
+      authCancelled: 'Google authorization cancelled',
+      cloudFailed: (err) => `Google Drive upload failed (${err})`,
+      cloudNoBackend: 'Extension backend not detected — cannot upload to Google Drive',
       exportFailed: (err) => `Export failed (${err}) — downloading self-contained HTML instead`,
       noBackend: 'Extension backend not detected — downloading self-contained HTML instead',
       error: (m) => `Error: ${m}`,
@@ -109,7 +124,10 @@
       fmtMd: 'Markdown',
       fmtHtml: 'HTML（自包含）',
       fmtGrok: 'Grok Markdown（AI 整理）',
+      fmtGDoc: '↗ Google Docs（在线文档）',
+      fmtGDrive: '↗ Google Drive（PDF 云盘）',
       openArchive: '存档库…',
+      openGuide: '使用教程…',
       grokWorking: '已交给 Grok 整理成 Markdown 文章（专家模式可能要几分钟）…',
       grokDone: 'Grok Markdown 已保存，见浏览器下载列表',
       grokFailed: (e) => `Grok 整理失败（${e}），普通 Markdown 导出仍可用`,
@@ -128,9 +146,21 @@
       inlining: (d, t) => `正在内联图片 ${d}/${t} …`,
       htmlDone: (blocks, ok, total) => `已下载 HTML：${blocks} 个块，${ok}/${total} 张图已内联`,
       pdfWorking: '正在生成 PDF…',
+      gdocWorking: '正在上传到 Google Docs…',
+      gdriveWorking: '正在生成 PDF 并上传到 Google Drive…',
       exporting: '正在导出…',
       exportDone: (fmt) => `${String(fmt || '').toUpperCase()} 已保存，见浏览器下载列表`,
       exportDoneArchived: (fmt) => `${String(fmt || '').toUpperCase()} 已保存 · 快照已存档`,
+      gdocDone: '已上传至 Google Docs',
+      gdocDoneArchived: '已上传至 Google Docs · 快照已存档',
+      gdriveDone: 'PDF 已上传至 Google Drive',
+      gdriveDoneArchived: 'PDF 已上传至 Google Drive · 快照已存档',
+      openGDocNow: '打开 Google Doc ↗',
+      openGDriveNow: '打开云端 PDF ↗',
+      openEnableApi: '去开启 API ↗',
+      authCancelled: '已取消 Google 账号授权',
+      cloudFailed: (err) => `云端上传失败（${err}）`,
+      cloudNoBackend: '未检测到扩展后台，无法上传至 Google 云端',
       exportFailed: (err) => `导出失败（${err}），改为本地下载自包含 HTML`,
       noBackend: '未检测到扩展后台，改为本地下载自包含 HTML',
       error: (m) => `出错：${m}`,
@@ -143,21 +173,35 @@
     return typeof v === 'function' ? v(...args) : v;
   };
 
-  function toast(msg, ms) {
-    let t = document.getElementById('__xae_toast');
-    if (!t) {
-      t = document.createElement('div');
-      t.id = '__xae_toast';
-      t.style.cssText =
+  function toast(msg, ms, action) {
+    let el = document.getElementById('__xae_toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = '__xae_toast';
+      el.style.cssText =
         'position:fixed;z-index:2147483647;left:50%;top:24px;transform:translateX(-50%);' +
         'background:#0f1419;color:#fff;padding:10px 18px;border-radius:999px;font:14px/1.4 system-ui,sans-serif;' +
         'box-shadow:0 6px 24px rgba(0,0,0,.28);pointer-events:none;max-width:80vw;text-align:center';
-      document.body.appendChild(t);
+      document.body.appendChild(el);
     }
-    t.textContent = msg;
-    t.style.display = 'block';
-    clearTimeout(t.__h);
-    if (ms) t.__h = setTimeout(() => t && (t.style.display = 'none'), ms);
+    el.textContent = '';
+    el.appendChild(document.createTextNode(msg));
+    if (action && action.url) {
+      el.style.pointerEvents = 'auto';
+      const a = document.createElement('a');
+      a.href = action.url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = action.label || action.url;
+      a.style.cssText =
+        'color:#4db5ff;font-weight:600;text-decoration:underline;margin-left:10px;white-space:nowrap;cursor:pointer';
+      el.appendChild(a);
+    } else {
+      el.style.pointerEvents = 'none';
+    }
+    el.style.display = 'block';
+    clearTimeout(el.__h);
+    if (ms) el.__h = setTimeout(() => el && (el.style.display = 'none'), ms);
   }
 
   // ---------- 行内序列化 ----------
@@ -1060,7 +1104,17 @@ pre code{background:none;padding:0}
       // 内联留给 viewer 页做——它本来就要为渲染把图加载一遍。
       const doc = buildDoc(data, data.blocks.join('\n'));
       pending = { mode, data };
-      toast(t(mode === 'pdf' ? 'pdfWorking' : 'exporting'));
+      toast(
+        t(
+          mode === 'pdf'
+            ? 'pdfWorking'
+            : mode === 'gdoc'
+            ? 'gdocWorking'
+            : mode === 'gdrive'
+            ? 'gdriveWorking'
+            : 'exporting'
+        )
+      );
       bridgeAlive = false;
       exportRunning = true;
       window.postMessage(
@@ -1075,13 +1129,16 @@ pre code{background:none;padding:0}
         '*'
       );
       // 2.5s 内桥接层连一声「我在」都没有 → 不在扩展环境里跑，退回本地下载。
-      // 只看桥接层是否活着，不看导出有没有跑完——万字长文的渲染 + 内联 + printToPDF
-      // 本来就要十几秒，不能因为慢就误判成失败、把它打断。
+      // 云端上传模式若无扩展后台，只提示错误，不触发本地 HTML 下载。
       setTimeout(() => {
         if (!bridgeAlive && exportRunning) {
           exportRunning = false;
-          toast(t('noBackend'), 6000);
-          runLocal(pending.mode, pending.data);
+          if (isCloudMode(pending.mode)) {
+            toast(t('cloudNoBackend'), 6000);
+          } else {
+            toast(t('noBackend'), 6000);
+            runLocal(pending.mode, pending.data);
+          }
         }
       }, 2500);
       // 兜底改成「静默超时」：只要 viewer 还在报进度就一直等下去，
@@ -1094,8 +1151,12 @@ pre code{background:none;padding:0}
         if (Date.now() - lastBeat < 60000) return;
         clearInterval(watchdog);
         exportRunning = false;
-        toast(t('exportFailed', 'no response'), 7000);
-        runLocal(pending.mode, pending.data);
+        if (isCloudMode(pending && pending.mode)) {
+          toast(t('cloudFailed', 'no response'), 7000);
+        } else {
+          toast(t('exportFailed', 'no response'), 7000);
+          runLocal(pending.mode, pending.data);
+        }
       }, 5000);
     } catch (e) {
       toast(t('error', e.message), 6000);
@@ -1106,7 +1167,8 @@ pre code{background:none;padding:0}
   };
 
   // 兜底：不弹打印对话框。扩展路径走不通时直接本地下载自包含 HTML，
-  // 同样是一个文件进下载列表，不打断操作。
+  // 同样是一个文件进下载列表，不打断操作。云端上传模式不降级为本地下载。
+  const isCloudMode = (m) => m === 'gdoc' || m === 'gdrive';
   let bridgeAlive = false;    // 桥接层是否回过话（证明在扩展环境里）
   let exportRunning = false;  // 是否有一次导出正在进行（避免兜底和结果重复处理）
   let pending = null;         // { mode, data }，兜底本地导出时要用
@@ -1142,8 +1204,30 @@ pre code{background:none;padding:0}
       if (!exportRunning) return; // 已被兜底接管，忽略迟到的结果，避免下载两份
       exportRunning = false;
       clearInterval(watchdog);
+      const fmt = e.data.format || (pending && pending.mode) || 'pdf';
       if (e.data.ok) {
-        toast(e.data.archived ? t('exportDoneArchived', e.data.format) : t('exportDone', e.data.format), 6000);
+        if (fmt === 'gdoc') {
+          toast(
+            e.data.archived ? t('gdocDoneArchived') : t('gdocDone'),
+            e.data.webViewLink ? 15000 : 6000,
+            e.data.webViewLink ? { url: e.data.webViewLink, label: t('openGDocNow') } : null
+          );
+        } else if (fmt === 'gdrive') {
+          toast(
+            e.data.archived ? t('gdriveDoneArchived') : t('gdriveDone'),
+            e.data.webViewLink ? 15000 : 6000,
+            e.data.webViewLink ? { url: e.data.webViewLink, label: t('openGDriveNow') } : null
+          );
+        } else {
+          toast(e.data.archived ? t('exportDoneArchived', fmt) : t('exportDone', fmt), 6000);
+        }
+      } else if (isCloudMode(fmt)) {
+        // 授权取消或云端上传报错：只提示清晰原因，绝不莫名下载本地 HTML；若带引导链接（如未开启 Drive API），提供可点击入口
+        toast(
+          e.data.cancelled ? t('authCancelled') : t('cloudFailed', e.data.error || 'unknown'),
+          e.data.guideUrl ? 15000 : 7000,
+          e.data.guideUrl ? { url: e.data.guideUrl, label: t('openEnableApi') } : null
+        );
       } else {
         toast(t('exportFailed', e.data.error || 'unknown'), 7000);
         if (pending) runLocal(pending.mode, pending.data);
@@ -1223,7 +1307,11 @@ pre code{background:none;padding:0}
       ['html', t('fmtHtml')],
       ['grok', t('fmtGrok')],
       ['-', ''],
+      ['gdoc', t('fmtGDoc')],
+      ['gdrive', t('fmtGDrive')],
+      ['-', ''],
       ['__archive', t('openArchive')],
+      ['__guide', t('openGuide')],
     ];
     items.forEach(([m, label]) => {
       if (m === '-') {
@@ -1241,6 +1329,7 @@ pre code{background:none;padding:0}
         e.preventDefault(); e.stopPropagation();
         closeFormatMenu();
         if (m === '__archive') window.postMessage({ __xae: 'openOptions' }, '*');
+        else if (m === '__guide') window.postMessage({ __xae: 'openGuide' }, '*');
         else window.__XAE_RUN(m, ctx && ctx());
       });
       menu.appendChild(row);

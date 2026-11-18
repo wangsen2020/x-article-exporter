@@ -22,6 +22,7 @@
 
   // document.write 会清空文档，先把要用的东西抓进闭包
   const Archive = self.XAEArchive;
+  const GDrive = self.XAEGDrive;
   const send = (msg) => chrome.runtime.sendMessage(msg);
 
   const MIME = { pdf: 'application/pdf', html: 'text/html', md: 'text/markdown' };
@@ -148,6 +149,22 @@
     send(Object.assign({ cmd: 'finish', id: ID }, payload));
   }
 
+  // 当云端上传期间发生 401 令牌刷新并拉起 Google 授权窗时，维持每 15s 一次进度心跳，
+  // 防止页面侧 60s 静默看门狗在用户完成授权前误判超时。
+  async function withAuthHeartbeat(run) {
+    let beat = 0;
+    const msg = (GDrive && GDrive.AUTH_WAIT_PROMPT) || '正在拉起 Google 授权窗：请选择账号并点击「Continue / 继续」授权云盘权限…';
+    const onInteractiveStart = () => {
+      step(msg);
+      if (!beat) beat = setInterval(() => step(msg), 15000);
+    };
+    try {
+      return await run(onInteractiveStart);
+    } finally {
+      if (beat) clearInterval(beat);
+    }
+  }
+
   // 总闸。上面每步都有超时，这条只防「谁都没想到的那种卡」。
   setTimeout(() => finish({ ok: false, error: '导出超时（4 分钟）' }), 240000);
 
@@ -195,9 +212,12 @@
     // ---- 产出目标文件 ----
     let blob = null;
     let ok = false;
+    let cancelled = false;
     let error = null;
+    let guideUrl = '';
+    let cloudFile = null;
 
-    if (format === 'pdf') {
+    if (format === 'pdf' || format === 'gdrive') {
       step('正在生成 PDF…');
       const res = await withTimeout(send({ cmd: 'print', id: ID, images: imgs.length }), 90000, null);
       if (res && res.pdf) {
@@ -210,7 +230,7 @@
       blob = new Blob([job.md || ''], { type: MIME.md + ';charset=utf-8' });
     }
 
-    // ---- 先落盘。用户要的就是这个文件，别让存档挡在它前面 ----
+    // ---- 先落盘或直传云端。用户要的就是这个产物，别让存档挡在它前面 ----
     const saveFile = async (b, ext) => {
       const url = URL.createObjectURL(b);
       const r = await withTimeout(
@@ -230,12 +250,41 @@
       else error = (r && r.error) || '下载未启动';
     };
 
-    if (blob) {
+    if (blob && (format === 'pdf' || format === 'md')) {
       step('正在保存文件…');
       await saveFile(blob, format);
+    } else if (blob && format === 'gdrive') {
+      if (!GDrive) {
+        error = '云端同步模块未加载';
+      } else {
+        try {
+          const up = await withAuthHeartbeat((onInteractiveStart) =>
+            GDrive.uploadPdfBlob({
+              title: job.title || meta.title || 'x-export',
+              pdfBlob: blob,
+              onProgress: step,
+              onInteractiveStart,
+            })
+          );
+          ok = true;
+          error = null;
+          cloudFile = {
+            format: 'gdrive',
+            filename: up.name,
+            fileId: up.id,
+            webViewLink: up.webViewLink,
+            at: Date.now(),
+          };
+        } catch (e) {
+          ok = false;
+          cancelled = !!(GDrive.isAuthCancelError && GDrive.isAuthCancelError(e));
+          error = (e && e.message) || String(e);
+          guideUrl = (e && e.guideUrl) || '';
+        }
+      }
     }
 
-    // ---- 自包含快照：存档用，html 格式的下载也用它 ----
+    // ---- 自包含快照：存档用，html 格式的下载和 gdoc 云端转换也用它 ----
     let snap = null;
     try {
       step('正在内联图片…');
@@ -247,6 +296,37 @@
       if (format === 'html' && snap) {
         step('正在保存文件…');
         await saveFile(new Blob([snap.html], { type: MIME.html + ';charset=utf-8' }), 'html');
+      } else if (format === 'gdoc') {
+        if (!GDrive) {
+          error = '云端同步模块未加载';
+        } else {
+          try {
+            const baseHtml = (snap && snap.html) || job.doc;
+            const up = await withAuthHeartbeat((onInteractiveStart) =>
+              GDrive.uploadAsGoogleDoc({
+                title: job.title || meta.title || 'X Article',
+                html: baseHtml,
+                meta,
+                onProgress: step,
+                onInteractiveStart,
+              })
+            );
+            ok = true;
+            error = null;
+            cloudFile = {
+              format: 'gdoc',
+              filename: up.name,
+              fileId: up.id,
+              webViewLink: up.webViewLink,
+              at: Date.now(),
+            };
+          } catch (e) {
+            ok = false;
+            cancelled = !!(GDrive.isAuthCancelError && GDrive.isAuthCancelError(e));
+            error = (e && e.message) || String(e);
+            guideUrl = (e && e.guideUrl) || '';
+          }
+        }
       }
       if (snap && meta.id && Archive) {
         step('正在写入存档…');
@@ -269,13 +349,26 @@
           20000,
           null
         );
+        if (cloudFile) {
+          await withTimeout(Archive.addFile(meta.id, cloudFile), 10000, null);
+        }
       }
     } catch (e) {
       console.error('[x-article-exporter] archive failed', e);
     }
 
-    if (!blob && format !== 'html') error = error || '没有可下载的内容';
-    finish({ ok, error, format, archived: !!(snap && meta.id) });
+    if (!blob && format !== 'html' && format !== 'gdoc') error = error || '没有可下载的内容';
+    finish({
+      ok,
+      cancelled,
+      error,
+      guideUrl,
+      format,
+      archived: !!(snap && meta.id),
+      webViewLink: (cloudFile && cloudFile.webViewLink) || '',
+      fileId: (cloudFile && cloudFile.fileId) || '',
+      filename: (cloudFile && cloudFile.filename) || '',
+    });
   })().catch((e) => {
     console.error('[x-article-exporter] viewer', e);
     finish({ ok: false, error: (e && e.message) || String(e) });

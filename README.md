@@ -27,25 +27,29 @@
   <img src="https://img.shields.io/badge/License-MIT-94a3b8?style=flat-square" alt="MIT License">
 </p>
 
-# X Article to PDF — Export Twitter Articles & Threads to PDF and Markdown
+# X Article to PDF — Save Twitter Threads & Articles to PDF, Google Docs & Markdown
 
 **X Article to PDF** is a free, open-source Chrome extension that saves X (Twitter) **Articles** and
-**threads** as real PDFs — selectable, searchable text and full-resolution images — or as Markdown and
-self-contained HTML, in one click, straight to your downloads. No print dialog, no new tab, no account.
+**threads** as real PDFs — selectable, searchable text and full-resolution images — as well as
+**Google Docs**, **Google Drive (PDF)**, Markdown, and self-contained HTML in one click. No print
+dialog, no copy-pasting, no account required.
 
-It can also turn a long self-thread (tip 1, tip 2, tip 3… posted as replies) into one clean Markdown
-article using X's own Grok, and paste Markdown into X's Article editor with the formatting intact.
+It also gives you a direct **X (Twitter) Google Docs integration** (creating editable narrow-margin
+Google Docs with auto-fitted embedded images), can turn a long self-thread into one clean Markdown
+article using X's own Grok, and pastes Markdown back into X's Article editor with formatting intact.
 
 ## Features
 
 ![X Article to PDF feature overview: capture, export, offline archive, Markdown import](docs/features.en.svg)
 
 - **X Article / Twitter thread → PDF**: vector text you can search and copy, images at original resolution
+- **Save X posts & threads → Google Docs / Google Drive**: 1-click upload via on-demand `drive.file` consent, narrow `36pt` margins, `720px` auto-fitted images, and quick-open links in the toast and Archive
 - **Twitter thread → Markdown**: plain Markdown export, or an AI rewrite into an article with **Grok Markdown**
 - **Self-contained HTML**: every image inlined, opens offline even if the original post is deleted
-- **Local archive**: optional on-device library of everything you exported
+- **Local archive**: optional on-device library of everything you exported (with 1-click upload to Google Docs)
 - **Markdown → X Article editor**: paste a Markdown draft and convert it to X's native formatting
-- **Private**: no server, no analytics; everything runs in your browser
+- **Built-in interactive visual guide**: click **Guide** in the top-right corner of the extension popup for annotated diagrams in 7 languages
+- **Private**: no server, no analytics; everything runs in your browser (Google Drive upload talks directly from your browser to Google only when clicked)
 
 ## How to use
 
@@ -56,12 +60,27 @@ article using X's own Grok, and paste Markdown into X's Article editor with the 
 ![The red PDF export icon in an X post's action bar, next to bookmark and share](docs/shot_pdf_button.png)
 
 - **Left-click** = export PDF (generated in the background, lands in your downloads)
-- **Right-click** = format menu: PDF / Markdown / HTML (self-contained, opens offline) / Grok Markdown / Archive
-- Clicking the extension's toolbar icon does the same as a left-click
+- **Right-click** = format menu: `PDF` / `Markdown` / `HTML (self-contained)` / `Grok Markdown` / `↗ Google Docs` / `↗ Google Drive (PDF)` / `Archive…` / `Visual Guide…`
+- Click the extension's toolbar icon to open the compact multi-format popup (with a **Guide** button in the top-right corner)
 
 > **Threads:** after installing, **reload the page once** before exporting. The extension reads the
 > thread from X's own network responses, and the current page's responses arrived before it was
 > installed. If nothing was captured it falls back to reading the page and tells you so.
+
+### Save X Posts & Threads to Google Docs or Google Drive
+
+Right-click the PDF icon and pick **↗ Google Docs** or **↗ Google Drive (PDF)** (or choose it from
+the toolbar popup):
+
+- **On-demand authorization only**: local exports never ask for Google sign-in. Only when you click a
+  cloud option does Chrome prompt once for Google's non-sensitive `drive.file` permission, restricted
+  to the `X Article Exporter` folder it creates in your Drive.
+- **Ready-to-read Google Docs layout**: exports directly to an editable Google Doc with narrow `36pt`
+  margins, preserved headings/quotes/links, and embedded images auto-fitted to the `720px` content width.
+- **Instant & persistent links**: click **Open Google Doc ↗** in the top toast when done, or reopen
+  and back-upload past snapshots anytime from the extension's Archive page.
+
+Read the step-by-step walkthrough: [How to Save X (Twitter) Posts, Threads & Articles to Google Docs](https://xexport.goodexts.com/blog/save-x-post-to-google-docs).
 
 ### Turn a Twitter thread into a Markdown article with Grok
 
@@ -111,6 +130,12 @@ selectable and searchable, and images keep their original resolution.
 Open the first post of the thread (its own page, `x.com/<user>/status/<id>`), reload the page once
 after installing, then click the PDF icon. The extension rebuilds the whole thread from X's own data,
 so posts that the timeline has scrolled out of view are not lost.
+
+### How do I save X posts or Twitter threads to Google Docs?
+
+Open the X Article or thread, right-click the red PDF icon (or open the toolbar popup), and click
+**Save to Google Docs**. The first time only, confirm Google's `drive.file` permission window; the
+extension uploads directly from your browser and gives you a clickable **Open Google Doc ↗** link.
 
 ### How do I convert a Twitter thread to Markdown for Obsidian or Notion?
 

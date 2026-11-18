@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "صدّر مقالات وسلاسل X إلى PDF قابل للبحث أو Markdown أو HTML. استورد Markdown إلى محرر X، مع أرشيف محلي بدون اتصال.",
+    "message": "احفظ مقالات ومنشورات وسلاسل X (Twitter) بصيغة PDF أو Google Docs أو Google Drive أو Markdown أو HTML مع أرشيف محلي دون اتصال.",
     "description": "Extension description"
   }
 }

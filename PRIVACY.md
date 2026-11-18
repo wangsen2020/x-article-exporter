@@ -1,6 +1,6 @@
 # 隐私政策 / Privacy Policy
 
-**最后更新：2026-10-06**
+**最后更新：2026-11-18**
 
 扩展名称：X Article → PDF
 
@@ -18,7 +18,9 @@
 
 ### 权限为什么需要
 
-`manifest.json` 声明了 4 个权限，逐条说明：
+`manifest.json` 声明了 5 个权限，逐条说明：
+
+- **`identity`** —— 纯按需使用：仅在你主动点击「↗ Google Docs」或「↗ Google Drive (PDF)」时，才调用 `chrome.identity` 请求你自己的 Google 账号授权（非敏感的最小权限 `https://www.googleapis.com/auth/drive.file`），用于在**你自己的 Google 云端硬盘**中创建 `X Article Exporter` 文件夹并上传你导出的文档/PDF。开发者无法获取你的 Google 账号信息、OAuth 令牌或任何云盘文件，安装或本地导出时不会请求授权。
 
 - **`debugger`** —— 唯一用途是调用 `chrome.debugger` + `Page.printToPDF`，把你当前导出
   的那篇文章在扩展自己开的一个后台标签页里渲染成真正的 PDF（矢量文字、可选中可搜索）。
@@ -38,9 +40,7 @@
      单篇快照（图片内联进 HTML）常有几 MB，普通 `storage.local` 的配额不够用。归档内容只
      存在你自己的设备上，扩展不会把它发到任何地方。
 
-- **`host_permissions`**（`x.com` / `twitter.com` / `pbs.twimg.com`）—— 内容脚本只在这三个
-  域名上运行，用于读取你正在查看的文章/推文串内容、抓取 `pbs.twimg.com` 上的图片字节以内联
-  进导出文件。在其他任何网站上，本扩展的内容脚本不运行、不加载。
+- **`host_permissions`**（`x.com` / `twitter.com` / `pbs.twimg.com` / `www.googleapis.com`）—— 内容脚本只运行在 `x.com`、`twitter.com` 与 `pbs.twimg.com`，用于读取你正在查看的文章/推文串内容并内联图片；`https://www.googleapis.com/*` 仅在你点击上传至 Google Docs / Google Drive 时，由扩展示例直接把该篇文章直接传至 Google Drive REST API v3（不经开发者或任何第三方中转服务器）。在其他任何网站上，本扩展的内容脚本不运行、不加载。
 
 ### 你导出的内容怎么被处理
 
@@ -56,6 +56,14 @@ Grok Markdown 功能（右键菜单里的「Grok Markdown」，只在你点了�
 账号，把当前推文串的正文作为一条提问发给 Grok，再把 Grok 写好的 Markdown 存进你的下载文件夹。
 这和你自己手动把内容粘给 Grok 是一回事，这段对话会出现在你自己的 Grok 历史里，受 X 的隐私政策
 约束。开发者和其他任何第三方都拿不到这些内容。
+
+### Google Docs 与 Google Drive（可选）
+
+「↗ Google Docs」和「↗ Google Drive (PDF)」为纯可选功能，只在你明确点击后才执行：
+
+- 仅使用 Google 非敏感权限范围 `https://www.googleapis.com/auth/drive.file`，扩展只能访问自己新建的 `X Article Exporter` 文件夹和文档，无法读取、修改或删除你云盘里的其他任何文件；
+- 授权窗口由 Chrome 原生或 Google 官方 OAuth 页面直接完成，文章正文和图片直接从你的浏览器发送至 Google Drive 官方接口，开发者服务器全程不接触任何数据；
+- 上传成功后，扩展只在你本机存档库记录生成的 Google Docs / Drive 链接与文件名，方便你日后一键打开，数据完全受你自己的 Google 账号条款约束。
 
 ### 产品官网页面
 
@@ -92,7 +100,7 @@ License: MIT
 
 # Privacy Policy (English)
 
-**Last updated: 2026-10-06**
+**Last updated: 2026-11-18**
 
 This extension **does not collect, store, or transmit any user data to the developer or any
 third party.** Everything happens locally in your own browser.
@@ -101,6 +109,7 @@ It has no accounts, no backend server, no analytics, no telemetry, and loads no 
 
 ### Why each permission is needed
 
+- **`identity`** — strictly on-demand: only when you explicitly click **Google Docs** or **Google Drive (PDF)** does the extension call `chrome.identity` to obtain an OAuth token for Google's non-sensitive `https://www.googleapis.com/auth/drive.file` scope, saving the exported file inside an `X Article Exporter` folder in your own Google Drive. Never invoked on install, startup, or local exports.
 - **`debugger`** — used solely to call `chrome.debugger` + `Page.printToPDF`, rendering the
   article you're exporting into a real PDF inside a background tab the extension itself opens.
   It is only attached to that self-created rendering tab and detached immediately after the PDF
@@ -113,9 +122,16 @@ It has no accounts, no backend server, no analytics, no telemetry, and loads no 
   HTML snapshots of exported posts in the extension's own on-device IndexedDB, so a deleted
   original post remains viewable locally. `unlimitedStorage` is needed because a single snapshot
   with inlined images can be several MB. Archive data never leaves your device.
-- **`host_permissions`** (`x.com`, `twitter.com`, `pbs.twimg.com`) — the content scripts run only
-  on these domains, to read the post you're viewing and fetch its images for inlining. The
-  extension does not run on any other site.
+- **`host_permissions`** (`x.com`, `twitter.com`, `pbs.twimg.com`, `www.googleapis.com`) — the content scripts run only
+  on `x.com`, `twitter.com`, and `pbs.twimg.com` to read the post you're viewing and fetch its images for inlining.
+  `https://www.googleapis.com/*` is used solely when you explicitly click to save an export to your own Google Docs
+  or Google Drive. The extension does not run on any other site.
+
+**Google Docs & Google Drive (optional).** Cloud upload only runs when you trigger it. With the minimal
+`https://www.googleapis.com/auth/drive.file` scope, the extension can only access the `X Article Exporter` folder
+and files it creates itself in your Google Drive — never any other files in your account. Your browser uploads
+directly to Google's API; we never receive tokens, content, or Drive metadata. Resulting document links are stored
+only in your own browser's local archive.
 
 **Grok Markdown** (the "Grok Markdown" item in the right-click menu, run only when you click it)
 is the one feature that hands content to anyone else, and that is X itself: the extension opens

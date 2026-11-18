@@ -115,11 +115,15 @@
     return (all || []).sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
   }
 
-  /** 记一个落盘文件：{ format, filename, downloadId, at } */
+  /** 记一个落盘或云端同步文件：{ format, filename, downloadId, fileId, webViewLink, at } */
   async function addFile(id, file) {
     const rec = await get(id);
     if (!rec) return null;
-    rec.files = (rec.files || []).filter((f) => f.downloadId !== file.downloadId);
+    rec.files = (rec.files || []).filter((f) => {
+      if (file.downloadId !== undefined && f.downloadId === file.downloadId) return false;
+      if (file.fileId !== undefined && (f.fileId === file.fileId || f.format === file.format)) return false;
+      return true;
+    });
     rec.files.push(file);
     await tx(POSTS, 'readwrite', (st) => st.put(rec));
     return rec;

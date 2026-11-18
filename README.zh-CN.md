@@ -27,13 +27,13 @@
   <img src="https://img.shields.io/badge/License-MIT-94a3b8?style=flat-square" alt="MIT License">
 </p>
 
-# X Article to PDF：推特长文、推文串一键导出 PDF / Markdown
+# X Article to PDF：推特长文、推文串一键导出 PDF / Google Docs / Markdown
 
 **X Article to PDF** 是一个免费开源的 Chrome 扩展：把 X（Twitter）的 **Article 长文**和**推文串**
-一键存成真正的 PDF——文字可选中、可搜索，图片保持原图分辨率——也能导出 Markdown 和自包含 HTML，
-直接进下载列表。不弹打印对话框、不开新标签页、不用注册账号。
+一键存成真正的 PDF——文字可选中、可搜索，图片保持原图分辨率——也支持一键转存至
+**Google Docs 在线文档**、**Google Drive（PDF 云盘）**、Markdown 与自包含 HTML。不弹打印框、不用手动复制排版。
 
-它还能用 X 自带的 Grok，把博主在评论区连续写的一长串（技巧 1、技巧 2、技巧 3……）整理成一篇
+还能用 X 自带的 Grok，把博主在评论区连续写的一长串（技巧 1、技巧 2、技巧 3……）整理成一篇
 干净的 Markdown 文章；反过来也能把 Markdown 贴进 X 的长文编辑器，自动排好版。
 
 ## 功能
@@ -41,11 +41,13 @@
 ![X Article to PDF 核心能力：抓取、导出、离线归档、Markdown 导入](docs/features.svg)
 
 - **推特长文 / 推文串 → PDF**：矢量文字可搜索可复制，图片原图分辨率
+- **X 帖子与长文 → Google Docs / Google Drive**：一键转存为默认窄边框（36pt）、配图自动适配 720px 版心宽度的 Google Doc 或云端 PDF，纯按需授权（仅 `drive.file` 权限），完成提示和存档库均带直达链接
 - **推文串 → Markdown**：直接导出，或用 **Grok Markdown** 让 AI 改写成一篇结构化文章
 - **自包含 HTML**：图片全部内联，原帖被删了也能离线打开
-- **本地存档库**：可选，导出过的内容在你自己的设备上留一份
+- **本地存档库**：可选，导出过的内容在你自己的设备上留一份，支持一键补传 Google Docs
 - **Markdown → X 长文编辑器**：贴进 Markdown 草稿，一键转成 X 原生排版
-- **隐私**：没有服务器、没有统计，全部在你的浏览器里完成
+- **内置 7 语言图文使用教程**：点击工具栏浮窗右上角「使用教程」即可打开带红框与箭头标注的完整教程
+- **隐私**：没有服务器、没有统计，本地处理；仅在你主动点击 Google 云端选项时从浏览器直连 Google 官方接口
 
 ## 用法
 
@@ -56,11 +58,21 @@
 ![X 帖子操作栏里的红色 PDF 导出图标，紧挨着书签和分享图标](docs/shot_pdf_button.png)
 
 - **左键** = 导出 PDF（后台生成，落到下载列表）
-- **右键** = 格式菜单：PDF / Markdown / HTML（自包含，可离线打开）/ Grok Markdown / 存档库
-- 也可以点浏览器工具栏上的扩展图标，效果同左键
+- **右键** = 格式菜单：`PDF` / `Markdown` / `HTML（自包含）` / `Grok Markdown` / `↗ Google Docs（在线文档）` / `↗ Google Drive（PDF 云盘）` / `存档库…` / `使用教程…`
+- 点击浏览器工具栏上的扩展图标可打开紧凑浮窗（右上角提供「使用教程」直达图文指南）
 
 > **推文串**：装完扩展后**刷新一次页面**再导出。扩展是从 X 自己的网络响应里读推文串的，
 > 当前页面的响应在扩展装好之前就已经到了。读不到时会自动改为从页面上抓，并提示你。
+
+### 一键把推特长文、推文串保存到 Google Docs 或 Google Drive
+
+在右键菜单点击 **↗ Google Docs（在线文档）** 或 **↗ Google Drive（PDF 云盘）**（也可在工具栏浮窗中点击）：
+
+- **纯按需授权**：本地导出 PDF / Markdown / HTML 完全无需登录 Google；只有当你主动点击云端选项时，才会触发 Google 非敏感权限 `drive.file`（仅访问扩展自己创建的 `X Article Exporter` 目录）。
+- **默认窄边框与配图适配**：自动生成默认 36pt 窄边框 Google Doc，保留标题、引用与链接，内嵌图片严格适配 720px 版心宽度。
+- **即点即开 + 历史持久化**：上传完毕后页面顶部会显示可点击的 **打开 Google Doc ↗** 锚文本；存档库也会持久保存云端文件链接，并支持历史快照一键补传云端。
+
+完整图文说明见：[如何把 X（推特）帖子、推文串和长文一键保存到 Google Docs](https://xexport.goodexts.com/zh/blog/save-x-post-to-google-docs)。
 
 ### 用 Grok 把推文串整理成 Markdown 文章
 
@@ -106,6 +118,10 @@ X 长文放不下的东西一律降级，宁可朴素也不丢字：表格 → `
 
 打开推文串第一条帖子的详情页（`x.com/<用户>/status/<id>`），装完扩展后先刷新一次页面，再点 PDF
 图标。扩展用 X 自己的数据重建整串，时间线滚出视野的帖子也不会丢。
+
+### 怎么把推特帖子或 X 长文保存到 Google Docs？
+
+打开帖子或 X 长文，右键红色 PDF 图标（或点击工具栏浮窗），选择 **转存到 Google Docs**。首次使用按需确认 Google `drive.file` 授权即可从浏览器直传并生成顶部直达链接，后续无需重复授权。
 
 ### 推文串怎么转成 Markdown，存进 Obsidian / Notion？
 

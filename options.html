@@ -17,8 +17,9 @@
        font:15px/1.6 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
   .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
 
-  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  header{display:flex;align-items:center;margin-bottom:6px}
   h1{font-size:1.5em;margin:0;letter-spacing:-.01em}
+  .guide-pill{margin-left:auto;height:30px;padding:0 12px;font-size:12px;border-radius:999px;white-space:nowrap}
   .sub{color:var(--mut);font-size:.9em;margin:0 0 20px}
 
   .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:22px}
@@ -53,6 +54,8 @@
   .path{color:var(--mut);font-size:.74em;word-break:break-all;
         border-top:1px dashed var(--line);padding-top:7px}
   .path b{font-weight:600;color:var(--fg)}
+  .path div + div{margin-top:4px}
+  .path a{color:var(--acc);text-decoration:underline;font-weight:500}
 
   .empty{text-align:center;color:var(--mut);padding:70px 20px;line-height:1.8}
   .empty strong{display:block;color:var(--fg);font-size:1.05em;margin-bottom:6px}
@@ -60,8 +63,8 @@
 </head>
 <body>
 <div class="wrap">
-  <header><h1>存档库</h1></header>
-  <p class="sub">每次导出都会在本地留一份自包含快照（图片已内联）。原帖被作者删除后，这里仍然打得开。</p>
+  <header><h1>存档库</h1><button class="guide-pill" id="openGuide" type="button">使用教程</button></header>
+  <p class="sub">每次导出都会在本地留一份自包含快照（图片已内联），原帖被删后仍可查看；同步至 Google Docs / Drive 后可在下方直接点击链接打开（首次点击会按需拉起 Google 授权，自动归档到云盘「X Article Exporter」目录）。</p>
 
   <div class="bar">
     <input type="search" id="q" placeholder="搜索标题、作者、正文…">
@@ -79,6 +82,7 @@
   </div>
 </div>
 <script src="archive.js"></script>
+<script src="gdrive.js"></script>
 <script src="options.js"></script>
 </body>
 </html>

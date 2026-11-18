@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "Xの長文・スレッドを検索可能なPDF/Markdown/HTMLに変換。Markdownを記事エディタへ取込み、オフライン保存も可能。",
+    "message": "X(Twitter)の記事・ポスト・スレッドをPDF、Googleドキュメント、Googleドライブ、Markdown、HTMLで保存。Markdown取込対応。",
     "description": "Extension description"
   }
 }

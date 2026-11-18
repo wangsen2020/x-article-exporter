@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "Ekspor Artikel & thread X ke PDF, Markdown, atau HTML. Impor Markdown ke editor X. Termasuk arsip offline lokal.",
+    "message": "Simpan Artikel, post & thread X (Twitter) ke PDF, Google Docs, Google Drive, Markdown, atau HTML. Impor Markdown ke editor X.",
     "description": "Extension description"
   }
 }

@@ -4,7 +4,7 @@
     "description": "Extension name"
   },
   "extDescription": {
-    "message": "Exporte artigos e threads do X para PDF pesquisável, Markdown ou HTML. Importe Markdown no editor do X. Arquivo offline incluso.",
+    "message": "Salve artigos, posts e threads do X (Twitter) em PDF, Google Docs, Google Drive, Markdown ou HTML. Importe Markdown no editor X.",
     "description": "Extension description"
   }
 }
